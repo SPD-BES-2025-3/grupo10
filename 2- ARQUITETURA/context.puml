@@ -1,0 +1,12 @@
+@startuml
+
+!include <C4/C4_Container>
+!include <C4/C4_Component>
+
+title Diagrama de contexto do SEM 
+
+Person(Usuario, "Colaborador", "Usuario utilizador do sistema")
+System(SistemaEstoqueMaquinario, "Sistema de Estoque e Maquinarios", "Sistema de Gerenciamento de Estoque e Frota de Maquinários")
+Rel(Usuario, SistemaEstoqueMaquinario, " [Utiliza]")
+
+@enduml

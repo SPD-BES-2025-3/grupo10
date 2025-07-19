@@ -1,0 +1,53 @@
+@startuml
+title DER - Sistema de Estoque e Frota
+
+entity "Usuário" as Usuario {
+  * id : UUID
+  --
+  nome : String
+  email : String
+  perfil : PerfilUsuario
+}
+
+entity "Produto" as Produto {
+  * id : UUID
+  --
+  nome : String
+  descricao : String
+  codigoItem : String
+  quantidade : int
+  unidadeMedida : String
+  precoCusto : double
+}
+
+entity "Maquinário" as Maquinario {
+  * id : UUID
+  --
+  tipo : TipoMaquinario
+  marca : String
+  modelo : String
+  anoFabricacao : int
+  numeroSerie : String
+}
+
+entity "Fornecedor" as Fornecedor {
+  * id : UUID
+  --
+  nome : String
+  cnpj : String
+  contato : String
+  endereco : String
+}
+
+' Relacionamentos com cardinalidade
+
+Usuario ||--o{ Maquinario : "responsável por"
+
+Fornecedor ||--o{ Produto : "fornece"
+
+Fornecedor ||--o{ Maquinario : "fornece"
+
+Produto }|--|| Maquinario : "associado a" 
+
+@enduml
+

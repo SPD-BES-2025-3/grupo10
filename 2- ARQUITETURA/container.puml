@@ -1,0 +1,22 @@
+@startuml
+
+!include <C4/C4_container>
+!include <C4/C4_Component>
+
+Person(Usuario, "Colaborador", "Usuário do sistema via navegador")
+
+System_Boundary(SEM, "SISTEMA DE ESTOQUE E FROTA DE MAQUINÁRIO") {
+    Container(WebApp, "Aplicação Web", "NodeJS + TypeScript", "Entrega o SPA ao navegador")
+    Container(SPA, "SPA do Sistema", "Next.js", "Interface interativa com todas as funcionalidades")
+    Container(API, "API do Sistema", "Express + TypeScript", "Serviço backend com regras de negócio e acesso a dados")
+    SystemDb(PostgreSQL, "PostgreSQL / Supabase", "Banco relacional para dados estruturados")
+    SystemDb(MongoDB, "MongoDB / Atlas", "Banco NoSQL para dados flexíveis")
+}
+
+Rel(Usuario, WebApp, "Acessa via navegador", "HTTPS")
+Rel_R(WebApp, SPA, "Entrega o conteúdo SPA", "HTTP")
+Rel(SPA, API, "Faz requisições à API", "HTTP/JSON")
+Rel(API, PostgreSQL, "Lê/Escreve dados estruturados", "String connection")
+Rel(API, MongoDB, "Lê/Escreve dados flexíveis", "String connection")
+
+@enduml

@@ -1,0 +1,33 @@
+@startuml
+!include <C4/C4_Container>
+!include <C4/C4_Component>
+
+' A fronteira do sistema envolve todos os containers'
+System_Boundary(SEM, "SISTEMA DE ESTOQUE E FROTA DE MAQUINÁRIOS") {
+    
+    Container(SPA, "SPA do Sistema", "Next.js", "Interface interativa com todas as funcionalidades")
+
+    ' A API é um container que contém outros componentes'
+    Container(API, "API do Sistema", "TypeScript", "Serviço backend com regras de negócio e acesso a dados") {
+        Component(EstoqueController, "EstoqueController", "Spring/Express", "Gerencia o CRUD de Itens")
+        Component(MaquinarioController, "MaquinarioController", "Spring/Express", "Gerencia o CRUD de Maquinários")
+        Component(FornecedorController, "FornecedorController", "Spring/Express", "Gerencia o CRUD de Fornecedores")
+        Component(UsuarioController, "UsuarioController", "Spring/Express", "Gerencia o CRUD de Usuários")
+    }
+
+    ' Os bancos de dados são containers a parte, mas dentro da fronteira do sistema'
+    ContainerDb(PostgreSQL, "PostgreSQL / Supabase", "Banco relacional para dados estruturados")
+    ContainerDb(MongoDB, "MongoDB / Atlas", "Banco NoSQL para dados flexíveis")
+}
+
+' Relacionamentos entre os containers
+Rel(SPA, API, "Faz requisições à API", "HTTP/JSON")
+
+' Relacionamentos entre os componentes e os containers de banco de dados
+Rel(EstoqueController, PostgreSQL, "Lê/Escreve dados de estoque", "node-postgres")
+Rel(MaquinarioController, PostgreSQL, "Lê/Escreve dados de maquinários", "node-postgres")
+Rel(FornecedorController, PostgreSQL, "Lê/Escreve dados de fornecedores", "node-postgres")
+Rel(UsuarioController, PostgreSQL, "Lê/Escreve dados de usuários", "node-postgres")
+Rel(MaquinarioController, MongoDB, "Lê/Escreve dados de manutenção (ex)", "Driver MongoDB")
+
+@enduml
