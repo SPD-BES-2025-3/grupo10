@@ -73,9 +73,9 @@ RN5 - A quantidade mínima de um item para notificação é de 10 unidades<br/>
 
 ## STACKS
 
-Tipo de aplicação: WEB local
-Tecnologia frontend: NextJS
-Tecnologia backend: Java ou Typescript
-Modelo de persistência: Hibrido (SQL e NoSQL)
-Banco de dados: PostgreSQL e MongoDB
-Gerenciamento de entregas: Trello
+Tipo de aplicação: WEB local<br/>
+Tecnologia frontend: NextJS<br/>
+Tecnologia backend: Java ou Typescript<br/>
+Modelo de persistência: Hibrido (SQL e NoSQL)<br/>
+Banco de dados: PostgreSQL e MongoDB<br/>
+Gerenciamento de entregas: Trello<br/>
