@@ -1,10 +1,3 @@
-Okay, vamos deixar o relatório mais direto e conciso, mantendo todas as informações essenciais.
-
-Relatório de Produção Individual - Sistema de Gerenciamento de Estoque e Manutenção de Maquinários
-Nome: Carlos (Seu Nome)
-Função Atribuída: Desenvolvedor Full-Stack, Arquiteto de Software e Documentador.
-Período: [Data de Início do Projeto] até 21 de julho de 2025.
-
 1. Atribuição de Cargo e Tarefas
 Atribuição: Atuei como único responsável pelo projeto, desde a concepção até a preparação para implementação. Minhas tarefas incluíram:
 
