@@ -1,0 +1,43 @@
+@startuml
+
+title "Fluxo de controle de uso do CRUD de maquinário"
+
+
+<style>
+    database {
+        backgroundColor: RoyalBlue;
+    }
+</style>
+
+actor "Usuario" as usr
+
+entity "MaquinarioPage" as mqnP
+entity "MaquinarioController" as mqnC
+entity "MaquinarioRepository" as mqnR
+
+database "Banco de Dados" as db
+
+
+usr -> mqnP: Acessa a página
+activate usr
+activate mqnP
+usr <--  mqnP: <<render>>
+
+usr -> mqnP: SubmeteFormulario
+mqnP -> mqnC: ProcessaRequisição (Método HTTP)
+activate mqnC
+mqnC -> mqnR: ValidaRequisição
+activate mqnR
+mqnR -> db: ExecutaOperacao
+mqnR <-- db: RetornarStatus
+mqnC <-- mqnR: RetornarStatus
+deactivate mqnR
+mqnP <-- mqnC: RetornarStatus
+deactivate mqnC
+
+mqnP --> usr: MensagemSucesso
+
+deactivate usr
+deactivate mqnP
+
+@enduml

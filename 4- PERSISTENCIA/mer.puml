@@ -1,5 +1,5 @@
 @startuml
-title DER - Sistema de Estoque e Frota
+title MER - Sistema de Estoque e Frota
 
 entity "Usuário" as Usuario {
   * id : UUID

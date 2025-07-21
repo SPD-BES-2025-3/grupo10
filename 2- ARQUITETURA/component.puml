@@ -12,7 +12,7 @@ System_Boundary(SEM, "SISTEMA DE ESTOQUE E FROTA DE MAQUINÁRIOS") {
         Component(EstoqueController, "EstoqueController", "Spring/Express", "Gerencia o CRUD de Itens")
         Component(MaquinarioController, "MaquinarioController", "Spring/Express", "Gerencia o CRUD de Maquinários")
         Component(FornecedorController, "FornecedorController", "Spring/Express", "Gerencia o CRUD de Fornecedores")
-        Component(UsuarioController, "UsuarioController", "Spring/Express", "Gerencia o CRUD de Usuários")
+        Component(ManutencaoController, "ManutencaoController", "Spring/Express", "Gerencia o CRUD de Usuários")
     }
 
     ' Os bancos de dados são containers a parte, mas dentro da fronteira do sistema'

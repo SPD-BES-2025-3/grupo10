@@ -1,0 +1,43 @@
+@startuml
+
+title "Fluxo de controle de uso do CRUD de produtos do estoque"
+
+
+<style>
+    database {
+        backgroundColor: RoyalBlue;
+    }
+</style>
+
+actor "Usuario" as usr
+
+entity "EstoquePage" as estqP
+entity "EstoqueController" as estqC
+entity "EstoqueRepository" as estqR
+
+database "Banco de Dados" as db
+
+
+usr -> estqP: Acessa a página
+activate usr
+activate estqP
+usr <--  estqP: <<render>>
+
+usr -> estqP: SubmeteFormulario
+estqP -> estqC: ProcessaRequisição (Método HTTP)
+activate estqC
+estqC -> estqR: ValidaRequisição
+activate estqR
+estqR -> db: ExecutaOperacao
+estqR <-- db: RetornarStatus
+estqC <-- estqR: RetornarStatus
+deactivate estqR
+estqP <-- estqC: RetornarStatus
+deactivate estqC
+
+estqP --> usr: MensagemSucesso
+
+deactivate usr
+deactivate estqP
+
+@enduml

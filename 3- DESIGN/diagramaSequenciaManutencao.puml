@@ -1,0 +1,23 @@
+@startuml
+title "Fluxo de Controle - Cadastro de Manutenção"
+
+actor "Usuário" as usr
+
+entity "ManutencaoPage" as page
+entity "ManutencaoController" as controller
+entity "ManutencaoService" as service
+entity "ManutencaoRepository" as repository
+
+usr -> page: Abre página de manutenção
+page --> usr: Exibe formulário
+
+usr -> page: Envia dados do formulário
+page -> controller: Requisição de cadastro
+controller -> service: Valida e processa dados
+service -> repository: Salva manutenção
+repository --> service: Confirmação
+service --> controller: Sucesso
+controller --> page: Atualiza interface
+page --> usr: Mensagem de sucesso
+
+@enduml
