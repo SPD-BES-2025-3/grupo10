@@ -31,9 +31,9 @@ RF14 - O sistema deve ter uma página de estoque dedicada a apresentação de in
 
 ## REQUISITOS DE QUALIDADE
 
-RQ1 - <SEGURANÇA> O Sistema deve guardar as informações dos colaboradores de maneira segura, respeitando a LGPD.<br/>
-RQ2 - <DISPONIBILIDADE> O Sistema deve estar disponível 99,9% do tempo, com no máximo 5 minutos de inoperabilidade, salvo seja por manutenções programadas.<br/>
-RQ3 - <PERFORMANCE> O sistema deve apresentar todas as informações em no máximo 0,3 segudnos ao usuário, independente de qual infromação ele esteja requisitando.<br/>
+RQ1 - **[SEGURANÇA]** O Sistema deve guardar as informações dos colaboradores de maneira segura, respeitando a LGPD.<br/>
+RQ2 - **[DISPONIBILIDADE]** O Sistema deve estar disponível 99,9% do tempo, com no máximo 5 minutos de inoperabilidade, salvo seja por manutenções programadas.<br/>
+RQ3 - **[PERFORMANCE]** O sistema deve apresentar todas as informações em no máximo 0,3 segudnos ao usuário, independente de qual infromação ele esteja requisitando.<br/>
 
 ## REGRAS DE NEGOCIO
 
