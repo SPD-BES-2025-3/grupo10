@@ -28,30 +28,40 @@ Essa comunicação ocorre através de uma rede (local para o MVP) via requisiç�
 Aqui se define o que se espera do sistema em termos de qualidade e como ele deve se comportar.
 
 ### SEGURANÇA (RQ1)
+
 A segurança das informações será garantida por meio de:
+
 * **Validação de Entrada:** Todos os dados recebidos pelo backend serão validados para prevenir falhas.
 * **Privacidade:** As informações pessoais dos responsáveis por manutenções (nome, contato) serão armazenadas de forma segura.
 * **Acesso Controlado:** Para o MVP local, o acesso será direto, sem um sistema de login complexo, o que já reduz riscos para esta fase.
 
 ### DISPONIBILIDADE (RQ2)
+
 Para a aplicação local, a disponibilidade significa que o sistema será **altamente estável e confiável**:
+
 * **Sem Interrupções Inesperadas:** O backend terá tratamento de erros robusto para que falhas não derrubem o sistema.
 * **Funcionalidade Contínua:** Ferramentas adequadas serão utilizadas para garantir que o sistema inicie e opere sem problemas.
 
 ### DESEMPENHO (RQ3)
+
 O sistema será **rápido e responsivo** para o usuário:
+
 * **Respostas Rápidas:** O objetivo é que a maioria das ações e informações apareça em menos de **0,3 segundos**.
 * **Consultas Otimizadas:** Prisma será utilizado para criar buscas eficientes no banco de dados.
 * **Carregamento Veloz:** Com o Next.js, as páginas devem carregar rapidamente para o usuário através de sua capacidade de pré-renderização e navegação otimizada, funcionando como um SPA após o carregamento inicial.
 
 ### USABILIDADE
+
 A interface do usuário será **intuitiva e fácil de usar**:
+
 * **Navegação Simples:** A navegação entre as telas de Maquinários, Estoque, Fornecedores, Manutenções e Dashboards será lógica e direta.
 * **Adaptável:** A interface se ajustará bem a diferentes tamanhos de tela (computador, tablet).
 * **Feedback Claro:** O sistema fornecerá mensagens visuais sobre o que está acontecendo (sucesso, erro, carregamento).
 
 ### ESCALABILIDADE
+
 Mesmo como um projeto inicial, o futuro crescimento é considerado:
+
 * **Partes Independentes:** Como o sistema é dividido (frontend, backend, banco de dados), cada parte pode crescer ou ser modificada sem impactar as outras.
 * **Tecnologias Robustas:** Next.js, TypeScript e PostgreSQL são tecnologias comprovadamente escaláveis, capazes de suportar o crescimento futuro do sistema.
 
@@ -62,15 +72,21 @@ Mesmo como um projeto inicial, o futuro crescimento é considerado:
 A visão arquitetural descreve o sistema em diferentes níveis de abstração, seguindo os princípios do Modelo C4, para detalhar como as partes do sistema se relacionam e funcionam:
 
 ### Nível 1: Diagrama de Contexto (Sistema no Ambiente)
+
 O **Sistema de Estoque e Frota de Maquinário** é utilizado por um **Colaborador** (usuário utilizador do sistema). O Colaborador acessa o sistema através de um navegador web. Atualmente, o sistema não se integra com outros sistemas externos.
 
+![Diagrama de Contexto C4](./context.png)
+
 ### Nível 2: Diagrama de Containers (Grandes Blocos de Implementação)
+
 O sistema é composto pelos seguintes containers, que representam as principais unidades de software implementáveis e executáveis:
 
 * **Aplicação Frontend:** Um aplicativo Next.js (com React e TypeScript) executado no navegador do usuário. Ele é responsável pela interface e pela interação.
 * **API Backend:** Uma API RESTful construída com Next.js API Routes (usando Node.js e TypeScript). Ela processa a lógica de negócio e se comunica com o banco de dados.
 * **PostgreSQL / Supabase (Banco relacional):** Um container de banco de dados relacional que armazena dados estruturados do sistema, como Maquinários, Produtos, Fornecedores, Manutenções e Responsáveis.
 * **MongoDB / Atlas (Banco NoSQL):** Um container de banco de dados NoSQL que armazena dados flexíveis. *(Nota: Embora o diagrama mostre o MongoDB, para o MVP, conforme as decisões anteriores, este banco seria para uso futuro, como telemetria, não estando totalmente integrado no escopo inicial de dados estruturados.)*
+
+![Diagrama de Containers C4](./container.png)
 
 ### Nível 3: Diagrama de Componentes (Módulos dentro da API Backend)
 
@@ -81,6 +97,8 @@ Este nível detalha os componentes principais dentro da **API do Sistema (Expres
 * **ManutencaoController:** Componente responsável por gerenciar o CRUD de Manutenção. Ele lê/escreve dados de manutenção ocorridos em um maquinário.
 * **MaquinarioController:** Componente responsável por gerenciar o CRUD de Maquinários. Ele lê/escreve dados de maquinários e de manutenção (o que, conforme o diagrama, inclui o MongoDB para dados flexíveis, embora o relacionamento primário de manutenção seja com o maquinário no PostgreSQL).
 
+![Diagrama de Componentes C4](./component.png)
+
 ---
 
 ## ESTRUTURA ARQUITETURAL DO PROJETO
@@ -89,7 +107,6 @@ Para manter tudo organizado e fácil de encontrar (e editar no futuro! 🛠️),
 
 * **`back/`**: Aqui está todo o código do **Backend**. É o "cérebro" do sistema, onde a lógica acontece e a API é construída.
     * Dentro de `back/`:
-        * `node_modules/`: As dependências específicas do backend (como o Express, se estivesse separado do Next.js API Routes).
         * `src/`: Onde está o código fonte principal do Backend.
             * **`controllers/`**: Pense nestes como os "porteiros" da API. Eles recebem os pedidos (requisições HTTP) do frontend e decidem para onde enviar a solicitação.
             * **`models/`**: Se houver classes que representam o "mundo real" do negócio (além das que o Prisma já gera automaticamente), elas vêm aqui.
@@ -97,7 +114,6 @@ Para manter tudo organizado e fácil de encontrar (e editar no futuro! 🛠️),
         * Outros arquivos (`.env`, `package.json`, `tsconfig.json`, `server.ts` se for Express puro): São as configurações e a "identidade" do backend.
 * **`front/`**: Esta pasta guarda todo o código do **Frontend**, ou seja, a interface que o usuário vê e interage.
     * Dentro de `my-app/`: É o projeto Next.js em si.
-        * `node_modules/`: As dependências específicas do frontend.
         * `pages/`: Aqui ficam as "telas" da aplicação (as `App Routes` do Next.js), que são a "visão" do padrão MVC. Cada arquivo aqui é uma página do site. 🌐
         * `components/`: Onde se guardam os blocos de montar a interface: botões, campos de formulário, tabelas. São peças reutilizáveis para construir as páginas. 🧱
         * `public/`: Para coisas que o navegador pode acessar diretamente, como imagens e ícones. 🖼️

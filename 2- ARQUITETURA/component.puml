@@ -1,33 +1,38 @@
 @startuml
+!theme vibrant
 !include <C4/C4_Container>
 !include <C4/C4_Component>
 
-' A fronteira do sistema envolve todos os containers'
+title "Diagrama de Componentes (C4 - Nível 3) - Layout Organizado"
+
 System_Boundary(SEM, "SISTEMA DE ESTOQUE E FROTA DE MAQUINÁRIOS") {
     
-    Container(SPA, "SPA do Sistema", "Next.js", "Interface interativa com todas as funcionalidades")
+    Container(SPA, "Aplicação Web", "Next.js / React", "Interface do usuário interativa que permite o gerenciamento completo do sistema.")
 
-    ' A API é um container que contém outros componentes'
-    Container(API, "API do Sistema", "TypeScript", "Serviço backend com regras de negócio e acesso a dados") {
-        Component(EstoqueController, "EstoqueController", "Spring/Express", "Gerencia o CRUD de Itens")
-        Component(MaquinarioController, "MaquinarioController", "Spring/Express", "Gerencia o CRUD de Maquinários")
-        Component(FornecedorController, "FornecedorController", "Spring/Express", "Gerencia o CRUD de Fornecedores")
-        Component(ManutencaoController, "ManutencaoController", "Spring/Express", "Gerencia o CRUD de Usuários")
+    Container_Boundary(API, "API RESTful") {
+        ' Componentes que interagem com o banco de dados relacional
+        Component(MaquinarioController, "MaquinarioController", "Node.js / Express", "Gerencia o CRUD dos dados cadastrais dos maquinários.")
+        Component(ResponsavelController, "ResponsavelController", "Node.js / Express", "Gerencia o CRUD de funcionários responsáveis.")
+        Component(EstoqueController, "EstoqueController", "Node.js / Express", "Gerencia o CRUD de itens e peças no estoque.")
+        
+        ' Componente que interage com o banco de dados NoSQL
+        Component(ManutencaoController, "ManutencaoController", "Node.js / Express", "Gerencia o histórico e o agendamento de manutenções.")
     }
 
-    ' Os bancos de dados são containers a parte, mas dentro da fronteira do sistema'
-    ContainerDb(PostgreSQL, "PostgreSQL / Supabase", "Banco relacional para dados estruturados")
-    ContainerDb(MongoDB, "MongoDB / Atlas", "Banco NoSQL para dados flexíveis")
+    ContainerDb(PostgreSQL, "Banco de Dados Relacional", "PostgreSQL", "Armazena dados estruturados (Maquinários, Responsáveis, Itens).")
+    ContainerDb(MongoDB, "Banco de Dados NoSQL", "MongoDB", "Armazena dados flexíveis (Registros de Manutenção).")
 }
 
-' Relacionamentos entre os containers
-Rel(SPA, API, "Faz requisições à API", "HTTP/JSON")
+' Relacionamento principal, de cima para baixo
+Rel_D(SPA, API, "Faz requisições à API", "HTTP/JSON")
 
-' Relacionamentos entre os componentes e os containers de banco de dados
-Rel(EstoqueController, PostgreSQL, "Lê/Escreve dados de estoque", "node-postgres")
-Rel(MaquinarioController, PostgreSQL, "Lê/Escreve dados de maquinários", "node-postgres")
-Rel(FornecedorController, PostgreSQL, "Lê/Escreve dados de fornecedores", "node-postgres")
-Rel(UsuarioController, PostgreSQL, "Lê/Escreve dados de usuários", "node-postgres")
-Rel(MaquinarioController, MongoDB, "Lê/Escreve dados de manutenção (ex)", "Driver MongoDB")
+' Relacionamentos dos componentes com os bancos de dados, forçando a direção para baixo
+Rel_Down(MaquinarioController, PostgreSQL, "Lê/Escreve em", "ORM (Prisma/TypeORM)")
+Rel_Down(ResponsavelController, PostgreSQL, "Lê/Escreve em", "ORM (Prisma/TypeORM)")
+Rel_Down(EstoqueController, PostgreSQL, "Lê/Escreve em", "ORM (Prisma/TypeORM)")
+Rel_Down(ManutencaoController, MongoDB, "Lê/Escreve em", "ODM (Mongoose)")
+
+' Relação interna entre componentes, forçando a direção para a direita
+Rel_Right(MaquinarioController, ManutencaoController, "Consulta histórico")
 
 @enduml
