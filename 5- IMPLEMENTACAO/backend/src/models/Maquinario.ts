@@ -1,5 +1,6 @@
-// models/Maquinario.ts
 import mongoose, { Schema, Document } from "mongoose";
+
+export type StatusMaquinario = 'OPERACIONAL' | 'EM MANUTENCAO' | 'INATIVO';
 
 export interface IMaquinario extends Document {
     tipo: string;
@@ -7,7 +8,7 @@ export interface IMaquinario extends Document {
     modelo: string;
     numeroSerie: string;
     anoFabricacao: number;
-    status: string; // Adicionado: Campo 'status'
+    status: StatusMaquinario;
 }
 
 const maquinarioSchema = new mongoose.Schema({
@@ -25,7 +26,7 @@ const maquinarioSchema = new mongoose.Schema({
     },
     numeroSerie: {
         type: String,
-        required: [true, "O numero de serie é obrigatório!"],
+        required: [true, "O numero de série é obrigatório!"],
         unique: true
     },
     anoFabricacao: {
@@ -35,10 +36,8 @@ const maquinarioSchema = new mongoose.Schema({
     status: {
         type: String,
         required: [true, "O status do maquinário é obrigatório!"],
-        enum: ['TRATOR', 'EMPILHADEIRA', 'RETROESCAVADEIRA', 'GUINDASTE', 'OUTRO']
+        enum: ['OPERACIONAL', 'EM MANUTENCAO', 'INATIVO']
     }
 }, { timestamps: true });
 
-const Maquinario = mongoose.model<IMaquinario>("Maquinario", maquinarioSchema);
-
-export { Maquinario, maquinarioSchema };
+export const Maquinario = mongoose.model<IMaquinario>("Maquinario", maquinarioSchema);

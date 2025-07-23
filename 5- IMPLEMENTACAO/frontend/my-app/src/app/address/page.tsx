@@ -67,7 +67,7 @@ export default function AddressPage() {
   // --- SEÇÃO DE RENDERIZAÇÃO (JSX) ---
 
   return (
-    <main className="bg-slate-900 min-h-screen p-8 text-white flex justify-center">
+    <main className="default-page-layout">
       <div className="w-full max-w-4xl">
         <h1 className="text-4xl font-bold text-cyan-400 mb-6 border-b border-slate-700 pb-4">
           Página de Teste com Dados da API

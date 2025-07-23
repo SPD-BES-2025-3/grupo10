@@ -28,7 +28,7 @@ const manutencaoSchema = new mongoose.Schema({
         type: String,
         required: [true, "O status da manutenção é obrigatório!"], // Sugerido: Tornar obrigatório
         // Se você quiser usar o Enum StatusManutencao, pode validar aqui ou no controller
-        // enum: ['AGENDADA', 'EM_ANDAMENTO', 'CONCLUIDA', 'CANCELADA']
+        enum: ['AGENDADA', 'EM_ANDAMENTO', 'CONCLUIDA', 'CANCELADA']
     },
     custoEstimado: {
         type: Number,

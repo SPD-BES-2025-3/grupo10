@@ -1,11 +1,11 @@
 import MaquinarioRepository from "../repositories/MaquinarioRepository";
 import { NextFunction, Request, Response } from "express";
 
-class AddressController {
+class MaquinarioController {
     async index(req: Request, res: Response, next: NextFunction) {
         try {
-            const getAllAddress = await MaquinarioRepository.findAll();
-            res.status(200).json(getAllAddress);
+            const maquinarios = await MaquinarioRepository.findAll();
+            res.status(200).json(maquinarios);
         } catch (error) {
             next(error);
         }
@@ -13,9 +13,12 @@ class AddressController {
 
     async show(req: Request, res: Response, next: NextFunction) {
         try {
-            const addressId = req.params.id;
-            const getAddress = await MaquinarioRepository.findbyId(addressId);
-            res.status(200).json(getAddress);
+            const maquinarioId = req.params.id;
+            const maquinario = await MaquinarioRepository.findById(maquinarioId);
+            if (!maquinario) {
+                res.status(404).json({ message: "Maquinário não encontrado." });
+            }
+            res.status(200).json(maquinario);
         } catch (error) {
             next(error);
         }
@@ -23,22 +26,25 @@ class AddressController {
 
     async storage(req: Request, res: Response, next: NextFunction) {
         try {
-            const newManutencao = await MaquinarioRepository.create(req.body);
-
-            res.status(201).json({ message: "Endereço criado com sucesso!", data: newManutencao });
-        } catch (error) {
+            const novoMaquinario = await MaquinarioRepository.create(req.body);
+            res.status(201).json({ message: "Maquinário criado com sucesso!", data: novoMaquinario });
+        } catch (error: any) {
+            if (error.code === 11000 && error.keyPattern && error.keyPattern.numeroSerie) {
+                res.status(409).json({ message: "Erro: O número de série informado já está cadastrado." });
+            }
             next(error);
         }
     }
 
     async update(req: Request, res: Response, next: NextFunction) {
         try {
-            const addressId = req.params.id;
+            const maquinarioId = req.params.id;
             const data = req.body;
-
-            await MaquinarioRepository.update(addressId, data);
-
-            res.status(200).json({ message: "Endereço atualizado!" });
+            const maquinarioAtualizado = await MaquinarioRepository.update(maquinarioId, data);
+            if (!maquinarioAtualizado) {
+                res.status(404).json({ message: "Maquinário não encontrado para atualizar." });
+            }
+            res.status(200).json({ message: "Maquinário atualizado com sucesso!", data: maquinarioAtualizado });
         } catch (error) {
             next(error);
         }
@@ -46,12 +52,17 @@ class AddressController {
 
     async delete(req: Request, res: Response, next: NextFunction) {
         try {
-            await MaquinarioRepository.delete(req.params.id);
-            res.status(200).json({ message: "Endereço deletado com sucesso!" });
+            const maquinarioId = req.params.id;
+            const maquinario = await MaquinarioRepository.findById(maquinarioId);
+             if (!maquinario) {
+                res.status(404).json({ message: "Maquinário não encontrado para deletar." });
+            }
+            await MaquinarioRepository.delete(maquinarioId);
+            res.status(200).json({ message: "Maquinário deletado com sucesso!" });
         } catch (error) {
             next(error);
         }
     }
 }
 
-export default new AddressController();
+export default new MaquinarioController();
