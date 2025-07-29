@@ -2,7 +2,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IManutencao extends Document {
-    descricao: string;
+    observacao: string;
     dataAgendada: Date;
     dataRealizada?: Date;
     status: string;
@@ -12,7 +12,11 @@ export interface IManutencao extends Document {
 }
 
 const manutencaoSchema = new mongoose.Schema({
-    descricao: {
+    titulo: {
+        type: String,
+        required: [true, "O titulo da manutenção é obrigatório!"]
+    },
+    observacao: {
         type: String,
         required: [true, "A descrição da manutenção é obrigatória!"] // Sugerido: Tornar obrigatório
     },
@@ -26,9 +30,8 @@ const manutencaoSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        required: [true, "O status da manutenção é obrigatório!"], // Sugerido: Tornar obrigatório
-        // Se você quiser usar o Enum StatusManutencao, pode validar aqui ou no controller
-        enum: ['AGENDADA', 'EM_ANDAMENTO', 'CONCLUIDA', 'CANCELADA']
+        required: [true, "O status da manutenção é obrigatório!"],
+        enum: ['MANUTENCAO_AGENDADA', 'EM_MANUTENCAO', 'CONCLUIDA', 'CANCELADA']
     },
     custoEstimado: {
         type: Number,

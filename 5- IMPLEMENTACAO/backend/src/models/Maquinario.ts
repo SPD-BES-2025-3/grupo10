@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-export type StatusMaquinario = 'OPERACIONAL' | 'EM MANUTENCAO' | 'INATIVO';
+export type StatusMaquinario = 'OPERACIONAL' | 'MANUTENCAO_AGENDADA' | 'EM_MANUTENCAO' | 'CONCLUIDA' | 'INATIVO';
 
 export interface IMaquinario extends Document {
     tipo: string;
@@ -36,7 +36,7 @@ const maquinarioSchema = new mongoose.Schema({
     status: {
         type: String,
         required: [true, "O status do maquinário é obrigatório!"],
-        enum: ['OPERACIONAL', 'EM MANUTENCAO', 'INATIVO']
+        enum: ['OPERACIONAL', 'MANUTENCÃO AGENDADA', 'EM MANUTENCAO', 'CONCLUIDA', 'INATIVO']
     }
 }, { timestamps: true });
 

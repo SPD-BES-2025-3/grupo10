@@ -1,6 +1,8 @@
 
 import { NextFunction, Request, Response } from "express";
 import ManutencaoRepository from "../repositories/ManutencaoRepository";
+import MaquinarioRepository from "../repositories/MaquinarioRepository";
+import { StatusMaquinario } from "../models/Maquinario";
 
 class ManutencaoController {
 
@@ -17,7 +19,7 @@ class ManutencaoController {
 
     async show(req: Request, res: Response, next: NextFunction) {
         try {
-            const manutencaoId = req.params.id; // req.params.id já é string
+            const manutencaoId = req.params.id;
 
             const manutencao = await ManutencaoRepository.show(manutencaoId);
 
@@ -53,25 +55,41 @@ class ManutencaoController {
 
     async update(req: Request, res: Response, next: NextFunction) {
         try {
-            const manutencaoId = req.params.id; // req.params.id já é string
-            const data = req.body; // Dados para atualização
+            const manutencaoId = req.params.id;
+            const data = req.body;
 
             const manutencaoAtualizada = await ManutencaoRepository.update(manutencaoId, data);
 
-            if (!manutencaoAtualizada) {
-                res.status(404).json({ message: "Manutenção não encontrada para atualização." });
+            if (manutencaoAtualizada) {
+                let novoStatusMaquinario: StatusMaquinario = 'OPERACIONAL';
+
+                switch (manutencaoAtualizada.status) {
+                    case "OPERACIONAL":
+                        novoStatusMaquinario = "OPERACIONAL";
+                        break;
+                    case "MANUTENCAO_AGENDADA":
+                        novoStatusMaquinario = "MANUTENCAO_AGENDADA";
+                        break;
+                    case "EM_MANUTENCAO":
+                        novoStatusMaquinario = "EM_MANUTENCAO";
+                        break;
+                    case "CONCLUIDA":
+                        novoStatusMaquinario = "OPERACIONAL";
+                        break;
+                    default:
+                        novoStatusMaquinario = "INATIVO";
+                        break;
+                }
+
+
+                await MaquinarioRepository.update(
+                    manutencaoAtualizada.maquinarioManutencao.toString(),
+                    { status: novoStatusMaquinario }
+                );
             }
 
-            res.status(200).json({ message: "Manutenção atualizada!", data: manutencaoAtualizada });
+            res.status(200).json({ message: "Manutenção e maquinário atualizados com sucesso!", data: manutencaoAtualizada });
         } catch (error) {
-            if (error instanceof Error) {
-                if (error.message.includes("não encontrada") || error.message.includes("inválido")) {
-                    res.status(404).json({ message: error.message });
-                }
-                if (error.name === 'ValidationError' || error.message.includes("obrigatório")) {
-                    res.status(400).json({ message: error.message });
-                }
-            }
             next(error);
         }
     }

@@ -1,5 +1,6 @@
 import { app } from "./src/app";
 import { dbConnection } from "./src/config/database";
+import { loadAllMongooseModels } from "./src/config/loadModels";
 
 const PORT = 8000;
 
@@ -12,11 +13,13 @@ async function db() {
 
     connect.once("open", () => {
         console.log("Conectado ao banco de dados!")
+
+        loadAllMongooseModels();
     })
 }
 
 db();
 
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, () => {
     console.log("API LISTENING ON PORT " + PORT);
 });

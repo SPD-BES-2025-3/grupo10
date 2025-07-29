@@ -3,8 +3,8 @@ import MaquinarioController from "../../controllers/MaquinarioController";
 
 export const maquinarioRoute = express.Router();
 
-maquinarioRoute.get("/maquinario", MaquinarioController.index)
-maquinarioRoute.get("/maquinario/:id", MaquinarioController.show)
-maquinarioRoute.post("/maquinario", MaquinarioController.storage)
-maquinarioRoute.put("/maquinario/:id", MaquinarioController.update)
-maquinarioRoute.delete("/maquinario/:id", MaquinarioController.delete)
+maquinarioRoute.get("/maquinario", (req, res, next) => MaquinarioController.index(req, res, next))
+maquinarioRoute.get("/maquinario/:id", (req, res, next) => MaquinarioController.show(req, res, next))
+maquinarioRoute.post("/maquinario", (req, res, next) => MaquinarioController.storage(req, res, next))
+maquinarioRoute.put("/maquinario/:id", (req, res, next) => MaquinarioController.update(req, res, next))
+maquinarioRoute.delete("/maquinario/:id", (req, res, next) => MaquinarioController.delete(req, res, next))

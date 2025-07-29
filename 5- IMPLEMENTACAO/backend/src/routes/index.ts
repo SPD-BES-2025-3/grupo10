@@ -1,23 +1,23 @@
-import express, {Request, Response} from "express";
-import { userRoute } from "./users/usersRoutes";
-import { addressRoute } from "./address/addressRoutes";
+// src/routes/index.ts
+
+import express, { Request, Response, Router } from "express"; // Importe 'Router' também
 import { maquinarioRoute } from "./maquinario/maquinarioRoutes";
 import { manutencaoRoute } from "./manutencao/manutencaoRoutes";
 import { responsavelRoute } from "./responsavel/responsavelRoutes";
-
+import { estoqueRoute } from "./estoque/estoqueRoutes";
 
 const routes = (app: express.Application) => {
-    app.route("/").get((req: Request, res: Response) => {
-        const message = "Curso de Node.JS";
+    app.route("/api").get((req: Request, res: Response) => {
+        const message = "";
         res.send(message || "Route not found");
-    })
+    });
 
     app.use(
-        userRoute, 
-        addressRoute, 
-        maquinarioRoute, 
-        manutencaoRoute,
-        responsavelRoute
+        "/api",
+        maquinarioRoute as Router,
+        manutencaoRoute as Router,
+        responsavelRoute as Router,
+        estoqueRoute as Router
     );
 }
 

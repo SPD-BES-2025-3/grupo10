@@ -40,6 +40,7 @@ class MaquinarioController {
         try {
             const maquinarioId = req.params.id;
             const data = req.body;
+            
             const maquinarioAtualizado = await MaquinarioRepository.update(maquinarioId, data);
             if (!maquinarioAtualizado) {
                 res.status(404).json({ message: "Maquinário não encontrado para atualizar." });

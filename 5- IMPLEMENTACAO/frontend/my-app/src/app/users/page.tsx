@@ -48,7 +48,7 @@ export default function UsersPage() {
 			try {
 				// Faz a requisição para a sua API de backend.
 				// Certifique-se que seu backend está rodando na porta 8000!
-				const response = await fetch('http://localhost:8000/users');
+				const response = await fetch('http://localhost:8000/api/users');
 
 				// Se a resposta não for OK (ex: erro 404 ou 500), nós lançamos um erro.
 				if (!response.ok) {

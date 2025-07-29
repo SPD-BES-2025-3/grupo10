@@ -28,3 +28,13 @@ body {
 .default-page-layout {
   @apply bg-slate-900 min-h-screen p-8 text-white flex justify-center
 }
+
+form {
+  input {
+    @apply bg-slate-700 p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-cyan-500
+  }
+
+  select{
+    @apply bg-slate-700 p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-cyan-500
+  }
+}
