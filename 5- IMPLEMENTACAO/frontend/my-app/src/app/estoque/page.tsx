@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react'
 import { IEstoqueGeralProps, IEstoqueProps } from './../../../../../backend/src/models/Estoque';
 import { IProdutoProps } from './../../../../../backend/src/models/Produto';
 
-export interface IEstoqueFormData {
+export interface IEstoqueFormDataProps {
     produtoId: string;
     codigoItem: string;
     nomeProduto?: string;
@@ -14,7 +14,7 @@ export interface IEstoqueFormData {
     estoqueMinimo: number;
 }
 
-const formData: IEstoqueFormData = {
+const formData: IEstoqueFormDataProps = {
     produtoId: '',
     codigoItem: '',
     nomeProduto: '',
@@ -26,7 +26,7 @@ const formData: IEstoqueFormData = {
 export default function EstoquePage() {
     const [estoqueGeral, setEstoqueGeral] = useState<IEstoqueGeralProps | null>(null);
     const [editingProdutoId, setEditingProdutoId] = useState<string>('');
-    const [dadosFormulario, setDadosFormulario] = useState<IEstoqueFormData>(formData);
+    const [dadosFormulario, setDadosFormulario] = useState<IEstoqueFormDataProps>(formData);
     const [showForm, setShowForm] = useState(false);
 
     const fetchEstoqueGeral = async () => {

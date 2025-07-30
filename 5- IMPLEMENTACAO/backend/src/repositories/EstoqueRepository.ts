@@ -52,6 +52,40 @@ class EstoqueRepository {
         }
     }
 
+    async sumTotalValueEstoque(): Promise<number> {
+        const sum = await Estoque.aggregate([
+            {
+                $match: { nomeInventario: "Estoque Geral" }
+            }, 
+            {
+                $unwind: "$itens"
+            }, 
+            {
+                $lookup: {
+                    from: "produtos",
+                    localField: "itens.produto",
+                    foreignField: "_id",
+                    as: "produtoInfo"
+                }
+            },
+            {
+                $unwind: "produtoInfo"
+            },
+            {
+                $group: {
+                    _id: "$_id",
+                    valorTotal: { $sum: { $multiply: ["$itens.quantidade", "itens.valorUnitario"]}}
+                }
+            }
+        ]);
+
+        if (sum.length > 0) {
+            return sum[0].totalValue;
+        }
+
+        return 0;
+    }
+
     async addOrUpdateProdutoEstoque(
         produtoData: { produtoId?: string; codigoItem?: string; nome?: string; precoUnitario?: number; },
         quantidade: number,
@@ -86,11 +120,11 @@ class EstoqueRepository {
                     nomeInventario,
                     "itens.produto": actualProductId
                 }, {
-                    "$set": {
-                        "itens.$.quantidade": quantidade,
-                        "itens.$.estoqueMinimo": estoqueMinimo
-                    }
-                }, { new: true }
+                "$set": {
+                    "itens.$.quantidade": quantidade,
+                    "itens.$.estoqueMinimo": estoqueMinimo
+                }
+            }, { new: true }
             );
 
             if (updatedEstoque) {

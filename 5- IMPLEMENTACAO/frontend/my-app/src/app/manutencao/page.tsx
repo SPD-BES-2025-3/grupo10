@@ -347,9 +347,9 @@ export default function ManutencaoPage() {
                         <button
                             type="button"
                             onClick={() => setShowForm(!showForm)}
-                            className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded transition-colors"
+                            className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded transition-colors cursor-pointer"
                         >
-                            {showForm ? 'Fechar Formulário' : 'Abrir Formulário'}
+                            {showForm ? <p className='flex items-center gap-1'><span className='text-xl'>+</span>Novo</p> : 'Abrir Formulário'}
                         </button>
                     </div>
 
@@ -472,7 +472,7 @@ export default function ManutencaoPage() {
                                 <button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded transition-colors disabled:bg-slate-500 disabled:cursor-not-allowed"
+                                    className="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded transition-colors disabled:bg-slate-500 disabled:cursor-not-allowed cursor-pointer"
                                 >
                                     {isSubmitting ? 'Salvando...' : (editingId ? 'Atualizar Manutenção' : 'Adicionar Manutenção')}
                                 </button>
