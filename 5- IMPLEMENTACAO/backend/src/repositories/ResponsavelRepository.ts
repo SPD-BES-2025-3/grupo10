@@ -1,77 +1,49 @@
-import { Responsavel } from "../models/Responsavel";
+import { Responsavel, IResponsavel } from "../models/Responsavel";
+import RedisPublisher from '../events/redisPublisher';
 
 class ResponsavelRepository {
-    async findAll(): Promise<object | void> {
-        try {
-            return await Responsavel.find({});
-        } catch (error) {
-            console.error("Erro ao buscar os responsaveis!")
-            throw error;
-        }
+    async findAll(): Promise<IResponsavel[]> {
+        return Responsavel.find({});
     }
 
-    async findbyId(id: string): Promise<object | void | null> {
-        try {
-            if (!id) {
-                return;
-            }
-
-            return await Responsavel.findById(id);
-        } catch (error) {
-            console.error("Erro ao tentar encontrar o responsavel!")
-            throw error;
-        }
+    async findbyId(id: string): Promise<IResponsavel | null> {
+        return Responsavel.findById(id);
     }
 
-    async findByCountry(country: string): Promise<object | void> {
-        try {
-            if (!country) {
-                return;
-            }
+    async create(data: Partial<IResponsavel>): Promise<IResponsavel> {
+        const newResponsavel = await Responsavel.create(data);
 
-            return await Responsavel.find({ "address.country": country });
-        } catch (error) {
-            console.error("Não foi possível encontrar os responsaveis!")
-            throw error;
-        }
+        await RedisPublisher.publishOperation({
+            entity: 'Responsavel',
+            operation: 'CREATE',
+            data: newResponsavel.toObject()
+        });
+
+        return newResponsavel;
     }
 
-    async create(data: JSON): Promise<object | void> {
-        try {
-            if (!data) {
-                return;
-            }
+    async update(id: string, data: Partial<IResponsavel>): Promise<IResponsavel | null> {
+        const updatedResponsavel = await Responsavel.findByIdAndUpdate(id, data, { new: true });
 
-            return await Responsavel.create(data);
-        } catch (error) {
-            console.error("Não foi possível criar um novo responsavel!")
-            throw error;
+        if (updatedResponsavel) {
+            await RedisPublisher.publishOperation({
+                entity: 'Responsavel',
+                operation: 'UPDATE',
+                data: updatedResponsavel.toObject()
+            });
         }
+        return updatedResponsavel;
     }
 
-    async update(id: string, data: JSON): Promise<object | void | null> {
-        try {
-            if (!id || !data) {
-                return;
-            }
+    async delete(id: string): Promise<void> {
+        const deletedResponsavel = await Responsavel.findByIdAndDelete(id);
 
-            return await Responsavel.findByIdAndUpdate(id, data);
-        } catch (error) {
-            console.error("Erro ao atualizar o responsavel!")
-            throw error;
-        }
-    }
-
-    async delete(id: string): Promise<object | void> {
-        try {
-            if (!id) {
-                return;
-            }
-
-            await Responsavel.findByIdAndDelete(id);
-        } catch (error) {
-            console.error("Erro ao apagar o responsavel!")
-            throw error;
+        if (deletedResponsavel) {
+            await RedisPublisher.publishOperation({
+                entity: 'Responsavel',
+                operation: 'DELETE',
+                data: deletedResponsavel.toObject()
+            });
         }
     }
 }

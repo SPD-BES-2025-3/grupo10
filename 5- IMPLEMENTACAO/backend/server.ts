@@ -1,25 +1,27 @@
 import { app } from "./src/app";
 import { dbConnection } from "./src/config/database";
+import { connectRedis } from "./src/config/redis";
 import { loadAllMongooseModels } from "./src/config/loadModels";
 
 const PORT = 8000;
 
-async function db() {
-    const connect = await dbConnection();
+async function startServer() {
+    const connectMongo = await dbConnection();
 
-    connect.on("error", () => {
-        console.log("Erro ao se conectar na base de dados!");
-    })
+    connectMongo.on("error", (err) => {
+        console.log("Erro ao se conectar na base de dados!", err);
+    });
 
-    connect.once("open", () => {
-        console.log("Conectado ao banco de dados!")
-
+    connectMongo.once("open", () => {
+        console.log("Conectado ao banco de dados MongoDB!");
         loadAllMongooseModels();
-    })
+    });
+
+    await connectRedis();
 }
 
-db();
-
-app.listen(PORT, () => {
-    console.log("API LISTENING ON PORT " + PORT);
+startServer().then(() => {
+    app.listen(PORT, () => {
+        console.log(`🚀 API OUVINDO NA PORTA ${PORT}`);
+    });
 });

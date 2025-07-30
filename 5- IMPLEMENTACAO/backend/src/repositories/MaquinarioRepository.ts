@@ -1,4 +1,5 @@
 import { Maquinario, IMaquinario } from '../models/Maquinario';
+import RedisPublisher from '../events/redisPublisher'; // 1. Importe o publisher
 
 type MaquinarioData = Partial<Omit<IMaquinario, '_id'>>;
 
@@ -12,15 +13,41 @@ class MaquinarioRepository {
     }
 
     async create(data: MaquinarioData): Promise<IMaquinario> {
-        return Maquinario.create(data);
+        const newMaquinario = await Maquinario.create(data);
+
+        await RedisPublisher.publishOperation({
+            entity: 'Maquinario',
+            operation: 'CREATE',
+            data: newMaquinario.toObject()
+        });
+
+        return newMaquinario;
     }
 
     async update(id: string, data: MaquinarioData): Promise<IMaquinario | null> {
-        return Maquinario.findByIdAndUpdate(id, data, { new: true });
+        const updatedMaquinario = await Maquinario.findByIdAndUpdate(id, data, { new: true });
+
+        if (updatedMaquinario) {
+            await RedisPublisher.publishOperation({
+                entity: 'Maquinario',
+                operation: 'UPDATE',
+                data: updatedMaquinario.toObject()
+            });
+        }
+
+        return updatedMaquinario;
     }
 
     async delete(id: string): Promise<void> {
-        await Maquinario.findByIdAndDelete(id);
+        const deletedMaquinario = await Maquinario.findByIdAndDelete(id);
+
+        if (deletedMaquinario) {
+            await RedisPublisher.publishOperation({
+                entity: 'Maquinario',
+                operation: 'DELETE',
+                data: deletedMaquinario.toObject()
+            });
+        }
     }
 }
 

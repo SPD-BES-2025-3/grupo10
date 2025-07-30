@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { Estoque, IEstoqueGeralProps, IEstoqueProps } from "../models/Estoque";
 import { Produto, IProdutoProps } from "../models/Produto";
+import RedisPublisher from '../events/redisPublisher'; // 1. Importa o publicador
 
 class EstoqueRepository {
     async findEstoqueGeral(nomeInventario: string = "Estoque Geral"): Promise<IEstoqueGeralProps | null> {
@@ -15,7 +16,15 @@ class EstoqueRepository {
     async createEstoqueGeral(nomeInventario: string = "Estoque Geral"): Promise<IEstoqueGeralProps> {
         try {
             const novoEstoque = new Estoque({ nomeInventario, itens: [] });
-            return await novoEstoque.save();
+            const savedEstoque = await novoEstoque.save();
+
+            await RedisPublisher.publishOperation({
+                entity: 'Estoque',
+                operation: 'CREATE',
+                data: savedEstoque.toObject()
+            });
+
+            return savedEstoque;
         } catch (error) {
             console.error("Erro ao criar estoque geral:", error);
             throw new Error("Não foi possível criar o estoque geral.");
@@ -24,7 +33,17 @@ class EstoqueRepository {
 
     async deleteEstoqueGeral(_id: string): Promise<IEstoqueGeralProps | null> {
         try {
-            return await Estoque.findByIdAndDelete(_id);
+            const deletedEstoque = await Estoque.findByIdAndDelete(_id);
+
+            if (deletedEstoque) {
+                await RedisPublisher.publishOperation({
+                    entity: 'Estoque',
+                    operation: 'DELETE',
+                    data: deletedEstoque.toObject()
+                });
+            }
+
+            return deletedEstoque;
         } catch (error) {
             console.error("Erro ao deletar estoque geral:", error);
             throw new Error("Não foi possível deletar o estoque geral.");
@@ -54,36 +73,13 @@ class EstoqueRepository {
 
     async sumTotalValueEstoque(): Promise<number> {
         const sum = await Estoque.aggregate([
-            {
-                $match: { nomeInventario: "Estoque Geral" }
-            }, 
-            {
-                $unwind: "$itens"
-            }, 
-            {
-                $lookup: {
-                    from: "produtos",
-                    localField: "itens.produto",
-                    foreignField: "_id",
-                    as: "produtoInfo"
-                }
-            },
-            {
-                $unwind: "produtoInfo"
-            },
-            {
-                $group: {
-                    _id: "$_id",
-                    valorTotal: { $sum: { $multiply: ["$itens.quantidade", "itens.valorUnitario"]}}
-                }
-            }
+            { $match: { nomeInventario: "Estoque Geral" } }, 
+            { $unwind: "$itens" }, 
+            { $lookup: { from: "produtos", localField: "itens.produto", foreignField: "_id", as: "produtoInfo" } },
+            { $unwind: "$produtoInfo" },
+            { $group: { _id: "$_id", valorTotal: { $sum: { $multiply: ["$itens.quantidade", "$produtoInfo.precoUnitario"] } } } }
         ]);
-
-        if (sum.length > 0) {
-            return sum[0].totalValue;
-        }
-
-        return 0;
+        return sum.length > 0 ? sum[0].valorTotal : 0;
     }
 
     async addOrUpdateProdutoEstoque(
@@ -99,7 +95,6 @@ class EstoqueRepository {
                 actualProductId = new mongoose.Types.ObjectId(produtoData.produtoId);
             } else if (produtoData.codigoItem) {
                 let produtoExistente = await Produto.findOne({ codigoItem: produtoData.codigoItem });
-
                 if (!produtoExistente) {
                     if (!produtoData.nome || !produtoData.precoUnitario) {
                         throw new Error("Nome e Preço Unitário são obrigatórios para criar um novo produto com CodigoItem.");
@@ -110,47 +105,36 @@ class EstoqueRepository {
                         precoUnitario: produtoData.precoUnitario
                     });
                 }
-                actualProductId = produtoExistente._id;
+                actualProductId = produtoExistente._id as mongoose.Types.ObjectId;
             } else {
                 throw new Error("É necessário fornecer um produtoId ou um codigoItem.");
             }
 
-            const updatedEstoque = await Estoque.findOneAndUpdate(
-                {
-                    nomeInventario,
-                    "itens.produto": actualProductId
-                }, {
-                "$set": {
-                    "itens.$.quantidade": quantidade,
-                    "itens.$.estoqueMinimo": estoqueMinimo
-                }
-            }, { new: true }
+            let estoqueFinal = await Estoque.findOneAndUpdate(
+                { nomeInventario, "itens.produto": actualProductId },
+                { "$set": { "itens.$.quantidade": quantidade, "itens.$.estoqueMinimo": estoqueMinimo } },
+                { new: true }
             );
 
-            if (updatedEstoque) {
-                return updatedEstoque;
+            if (!estoqueFinal) {
+                estoqueFinal = await Estoque.findOneAndUpdate(
+                    { nomeInventario },
+                    { "$push": { itens: { produto: actualProductId, quantidade, estoqueMinimo } } },
+                    { new: true, upsert: true }
+                );
             }
 
-            const newEstoque = await Estoque.findOneAndUpdate(
-                { nomeInventario },
-                {
-                    "$push": {
-                        itens: {
-                            produto: actualProductId,
-                            quantidade,
-                            estoqueMinimo
-                        }
-                    }
-                },
-                { new: true, upsert: true }
-            );
-
-            if (!newEstoque) {
+            if (!estoqueFinal) {
                 throw new Error("Não foi possível adicionar o produto ao estoque. Documento de estoque não encontrado ou criado.");
             }
 
-            return newEstoque;
+            await RedisPublisher.publishOperation({
+                entity: 'Estoque',
+                operation: 'UPDATE',
+                data: estoqueFinal.toObject()
+            });
 
+            return estoqueFinal;
         } catch (error) {
             console.error("Erro ao adicionar/atualizar produto no estoque:", error);
             throw new Error("Não foi possível adicionar/atualizar o produto no estoque.");
@@ -163,15 +147,18 @@ class EstoqueRepository {
 
             const updatedEstoque = await Estoque.findOneAndUpdate(
                 { nomeInventario },
-                {
-                    "$pull": {
-                        itens: {
-                            produto: objectIdProduto
-                        }
-                    }
-                },
+                { "$pull": { itens: { produto: objectIdProduto } } },
                 { new: true }
             );
+
+            if (updatedEstoque) {
+                await RedisPublisher.publishOperation({
+                    entity: 'Estoque',
+                    operation: 'UPDATE',
+                    data: updatedEstoque.toObject()
+                });
+            }
+
             return updatedEstoque;
         } catch (error) {
             console.error("Erro ao remover produto do estoque:", error);

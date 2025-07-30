@@ -34,14 +34,13 @@ class ResponsavelController {
     }
 
     async storage(req: Request, res: Response, next: NextFunction): Promise<void> {
-        const newResponsavel = req.body;
-
+        
         try {
-
-            await ResponsavelRepository.create(newResponsavel);
-            res.status(201).json({ message: "Usuario criado com sucesso!", data: newResponsavel });
+            const newResponsavel = req.body;
+            const data = await ResponsavelRepository.create(newResponsavel);
+            
+            res.status(201).json({ message: "Usuario criado com sucesso!", data: data });
         } catch (error) {
-
             next(error);
         }
     }

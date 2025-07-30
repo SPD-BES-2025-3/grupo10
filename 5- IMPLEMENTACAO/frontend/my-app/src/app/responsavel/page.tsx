@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react'
 export interface IResponsavelProps {
     _id: string,
     nome: string,
+    cpf: string,
     email: string,
     telefone: string
 }
@@ -14,6 +15,7 @@ export interface IResponsavelProps {
 const formData: Omit<IResponsavelProps, "_id"> = {
     nome: '',
     email: '',
+    cpf: '',
     telefone: ''
 }
 
@@ -58,6 +60,7 @@ export default function ResponsavelPage() {
         setDadosFormulario({
             nome: responsavel.nome,
             email: responsavel.email,
+            cpf: responsavel.cpf,
             telefone: responsavel.telefone
         })
 
@@ -167,9 +170,24 @@ export default function ResponsavelPage() {
                                     <input
                                         type="tel"
                                         name="telefone"
+                                        minLength={11}
+                                        maxLength={15}
                                         onChange={handleInputChange}
                                         value={dadosFormulario.telefone}
                                         placeholder='(00) 00000-0000'
+                                        className=""
+                                    />
+                                </label>
+                                <label className='flex flex-col gap-1'>
+                                    <span className="text-sm font-medium text-slate-300">CPF</span>
+                                    <input
+                                        type="text"
+                                        name="cpf"
+                                        minLength={11}
+                                        maxLength={14}
+                                        onChange={handleInputChange}
+                                        value={dadosFormulario.cpf}
+                                        placeholder='000.000.000-00'
                                         className=""
                                     />
                                 </label>

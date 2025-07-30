@@ -3,6 +3,7 @@ import { Manutencao, IManutencao } from "../models/Manutencao";
 import { Maquinario } from "../models/Maquinario";
 import { Responsavel } from "../models/Responsavel";
 import mongoose from "mongoose";
+import RedisPublisher from '../events/redisPublisher'; // 1. Importa o publicador de eventos
 
 class ManutencaoRepository {
     async index(): Promise<IManutencao[]> {
@@ -57,8 +58,16 @@ class ManutencaoRepository {
             } else {
                 throw new Error("ID do responsável é obrigatório para a manutenção.");
             }
+
+            const newManutencao = await Manutencao.create(data);
+
+            await RedisPublisher.publishOperation({
+                entity: 'Manutencao',
+                operation: 'CREATE',
+                data: newManutencao.toObject()
+            });
             
-            return await Manutencao.create(data);
+            return newManutencao;
         } catch (error: any) {
             console.error("Erro no ManutencaoRepository.create:", error);
             throw new Error(`Erro ao criar manutenção: ${error.message}`);
@@ -89,9 +98,16 @@ class ManutencaoRepository {
 
             const updatedManutencao = await Manutencao.findByIdAndUpdate(id, data, { new: true }).exec();
 
-            if (!updatedManutencao) {
+            if (updatedManutencao) {
+                await RedisPublisher.publishOperation({
+                    entity: 'Manutencao',
+                    operation: 'UPDATE',
+                    data: updatedManutencao.toObject()
+                });
+            } else {
                 throw new Error("Manutenção não encontrada para atualização.");
             }
+
             return updatedManutencao;
         } catch (error: any) {
             console.error("Erro no ManutencaoRepository.update:", error);
@@ -104,8 +120,15 @@ class ManutencaoRepository {
             if (!mongoose.Types.ObjectId.isValid(id)) {
                 throw new Error("ID de Manutenção inválido para exclusão.");
             }
-            const result = await Manutencao.findByIdAndDelete(id).exec();
-            if (!result) {
+            const deletedManutencao = await Manutencao.findByIdAndDelete(id).exec();
+            
+            if (deletedManutencao) {
+                await RedisPublisher.publishOperation({
+                    entity: 'Manutencao',
+                    operation: 'DELETE',
+                    data: deletedManutencao.toObject()
+                });
+            } else {
                 throw new Error("Manutenção não encontrada para exclusão.");
             }
         } catch (error: any) {
