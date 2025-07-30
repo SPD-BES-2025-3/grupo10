@@ -3,14 +3,14 @@ import { Manutencao, IManutencao } from "../models/Manutencao";
 import { Maquinario } from "../models/Maquinario";
 import { Responsavel } from "../models/Responsavel";
 import mongoose from "mongoose";
-import RedisPublisher from '../events/redisPublisher'; // 1. Importa o publicador de eventos
+import RedisPublisher from '../events/redisPublisher';
 
 class ManutencaoRepository {
     async index(): Promise<IManutencao[]> {
         try {
             const manutenções = await Manutencao.find({})
                 .populate('maquinarioManutencao', 'tipo marca modelo numeroSerie')
-                .populate('responsavelManutencao', 'nome email telefone')
+                .populate('responsavelManutencao', 'nome email telefone cargo')
                 .exec();
             return manutenções;
         } catch (error: any) {

@@ -1,10 +1,8 @@
 'use client';
 
-import { useParams } from 'next/navigation';
 import React, { useState, useEffect, FormEvent, useCallback } from 'react';
-import { ActionButton } from '@/components/ActionButton'; // Importando o ActionButton genérico
+import { ActionButton } from '@/components/ActionButton';
 
-// --- Interfaces para os objetos ---
 interface MaquinarioOption {
     _id: string;
     tipo: string;
@@ -16,26 +14,26 @@ interface MaquinarioOption {
 interface ResponsavelOption {
     _id: string;
     nome: string;
+    cargo: string;
     email: string;
 }
 
-export interface Manutencao { // Exportando a interface para possível reutilização
+export interface Manutencao {
     _id: string;
     titulo: string;
     observacao: string;
-    dataAgendada: string; // Usar string para o input type="date"
-    dataRealizada?: string; // Usar string para o input type="date", pode ser opcional
+    dataAgendada: string;
+    dataRealizada?: string;
     status: 'MANUTENCAO_AGENDADA' | 'EM_MANUTENCAO' | 'CONCLUIDA' | 'CANCELADA'; // Enum de status
     custoEstimado: number;
-    maquinarioManutencao: MaquinarioOption; // Populated object
-    responsavelManutencao: ResponsavelOption; // Populated object
+    maquinarioManutencao: MaquinarioOption;
+    responsavelManutencao: ResponsavelOption;
 }
 
-// --- Estado inicial para o formulário ---
-// Garante que os IDs sejam string vazia para inputs controlados
+
 const initialState: Omit<Manutencao, '_id' | 'maquinarioManutencao' | 'responsavelManutencao'> & {
-    maquinarioManutencao: string; // Para armazenar apenas o ID no formData
-    responsavelManutencao: string; // Para armazenar apenas o ID no formData
+    maquinarioManutencao: string; 
+    responsavelManutencao: string;
 } = {
     titulo: '',
     observacao: '',
@@ -43,11 +41,10 @@ const initialState: Omit<Manutencao, '_id' | 'maquinarioManutencao' | 'responsav
     dataRealizada: '',
     status: 'MANUTENCAO_AGENDADA',
     custoEstimado: 0,
-    maquinarioManutencao: '', // ID do maquinário
-    responsavelManutencao: '', // ID do responsável
+    maquinarioManutencao: '',
+    responsavelManutencao: '', 
 };
 
-// --- Componente de Modal de Confirmação ---
 interface ConfirmModalProps {
     message: string;
     onConfirm: () => void;
@@ -80,7 +77,6 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({ message, onConfirm, onCance
     );
 };
 
-// --- Componente de Mensagem/Alerta ---
 interface MessageModalProps {
     message: string;
     type: 'success' | 'error' | 'info';
@@ -107,32 +103,23 @@ const MessageModal: React.FC<MessageModalProps> = ({ message, type, onClose }) =
 };
 
 export default function ManutencaoPage() {
-    // --- SEÇÃO DE ESTADO ---
     const [manutencaoList, setManutencaoList] = useState<Manutencao[]>([]);
     const [maquinarioOptions, setMaquinarioOptions] = useState<MaquinarioOption[]>([]);
     const [responsavelOptions, setResponsavelOptions] = useState<ResponsavelOption[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Estado para os dados do formulário
     const [formData, setFormData] = useState(initialState);
-    // Estado para saber se estamos editando (armazena o ID do item em edição)
     const [editingId, setEditingId] = useState<string | null>(null);
-    // Estado para o feedback do envio
     const [isSubmitting, setIsSubmitting] = useState(false);
-    // Estado para controlar a visibilidade do formulário (novo)
     const [showForm, setShowForm] = useState(false);
 
 
-    // Estados para os modais personalizados
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [confirmActionId, setConfirmActionId] = useState<string | null>(null);
     const [showMessageModal, setShowMessageModal] = useState(false);
     const [messageModalContent, setMessageModalContent] = useState({ message: '', type: 'info' as 'success' | 'error' | 'info' });
 
-    // --- SEÇÃO DE BUSCA DE DADOS (DATA FETCHING) ---
-
-    // Função para buscar manutenções
     const fetchManutencoes = useCallback(async () => {
         try {
             setLoading(true);
@@ -151,14 +138,6 @@ export default function ManutencaoPage() {
             setLoading(false);
         }
     }, []);
-
-    // A função findMaquinario não está sendo usada no componente, pode ser removida ou adaptada.
-    // function findMaquinario(): Promise<MaquinarioOption | undefined> {
-    //     const maquinarioId = useParams();
-    //     const maquinario = await fetch(`http://localhost:8000/api/${maquinarioId}`)
-    //     if (maquinario)
-    //         return maquinario.json();
-    // }
 
     // Função para buscar opções de maquinários
     const fetchMaquinarioOptions = useCallback(async () => {
@@ -217,8 +196,8 @@ export default function ManutencaoPage() {
             dataRealizada: manutencao.dataRealizada || '',
             custoEstimado: manutencao.custoEstimado,
             status: manutencao.status,
-            maquinarioManutencao: manutencao.maquinarioManutencao?._id || '', // Garante string vazia se null/undefined
-            responsavelManutencao: manutencao.responsavelManutencao?._id || '', // Garante string vazia se null/undefined
+            maquinarioManutencao: manutencao.maquinarioManutencao?._id || '',
+            responsavelManutencao: manutencao.responsavelManutencao?._id || '',
         });
         setShowForm(true); // Abre o formulário ao editar
         window.scrollTo(0, 0); // Rola a página para o topo para ver o formulário
@@ -266,7 +245,6 @@ export default function ManutencaoPage() {
         setIsSubmitting(true);
         setError(null);
 
-        // Formata as datas para o formato ISO string antes de enviar
         const dataToSend = {
             ...formData,
             dataAgendada: formData.dataAgendada ? new Date(formData.dataAgendada).toISOString() : '',
@@ -295,9 +273,9 @@ export default function ManutencaoPage() {
 
             setMessageModalContent({ message: `Manutenção ${editingId ? 'atualizada' : 'criada'} com sucesso!`, type: 'success' });
             setShowMessageModal(true);
-            handleCancelEdit(); // Limpa o formulário e fecha
-            await fetchManutencoes(); // Recarrega a lista de manutenções
-            await fetchMaquinarioOptions(); // Recarrega as opções de maquinário para refletir o status novo
+            handleCancelEdit();
+            await fetchManutencoes();
+            await fetchMaquinarioOptions();
 
         } catch (err: any) {
             setError(err.message);
@@ -308,10 +286,8 @@ export default function ManutencaoPage() {
         }
     };
 
-    // Função para formatar a data para o input type="date" (YYYY-MM-DD)
     const formatDateForInput = (date: Date | string | undefined) => {
         if (!date) return '';
-        // Cria um novo objeto Date para evitar problemas com fuso horário
         const d = new Date(date);
         const year = d.getUTCFullYear();
         const month = String(d.getUTCMonth() + 1).padStart(2, '0');
@@ -330,7 +306,6 @@ export default function ManutencaoPage() {
         }).format(value);
     };
 
-    // --- SEÇÃO DE RENDERIZAÇÃO (JSX) ---
     return (
         <main className="bg-slate-900 min-h-screen p-4 md:p-8 text-white flex flex-col items-center font-inter">
             <div className="w-full max-w-4xl">
@@ -515,8 +490,8 @@ export default function ManutencaoPage() {
                                             <p className="text-slate-300">
                                                 Maquinário: {manutencao.maquinarioManutencao ? `${manutencao.maquinarioManutencao.tipo} - ${manutencao.maquinarioManutencao.marca} (${manutencao.maquinarioManutencao.modelo})` : 'N/A'}
                                             </p>
-                                            <p className="text-slate-300">
-                                                Responsável: {manutencao.responsavelManutencao ? manutencao.responsavelManutencao.nome : 'N/A'}
+                                            <p className="text-slate-300 flex flex-col">
+                                                <span>Responsável: {manutencao.responsavelManutencao ? manutencao.responsavelManutencao.nome : 'N/A'} ({manutencao.responsavelManutencao ? manutencao.responsavelManutencao.cargo : 'N/A'})</span>
                                             </p>
                                             <p className="text-slate-300">Agendada para: {formatDateForInput(manutencao.dataAgendada)}</p>
                                             <p className="text-slate-300">Realizada em: {manutencao.dataRealizada ? formatDateForInput(manutencao.dataRealizada) : "Pendente"}</p>

@@ -81,6 +81,9 @@ class ManutencaoController {
                         break;
                 }
 
+                if(!manutencaoAtualizada.maquinarioManutencao){
+                    return;
+                }
 
                 await MaquinarioRepository.update(
                     manutencaoAtualizada.maquinarioManutencao.toString(),

@@ -2,13 +2,14 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IManutencao extends Document {
+    titulo: string;
     observacao: string;
     dataAgendada: Date;
     dataRealizada?: Date;
     status: string;
     custoEstimado: number;
-    maquinarioManutencao: mongoose.Schema.Types.ObjectId;
-    responsavelManutencao: mongoose.Schema.Types.ObjectId; // Adicionado: Campo para o Responsável
+    maquinarioManutencao: mongoose.Schema.Types.ObjectId | string | undefined;
+    responsavelManutencao: mongoose.Schema.Types.ObjectId | string | undefined; // Adicionado: Campo para o Responsável
 }
 
 const manutencaoSchema = new mongoose.Schema({
