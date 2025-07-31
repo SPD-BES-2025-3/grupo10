@@ -1,81 +1,109 @@
 # DOCUMENTO DE ESPECIFICAÇÃO DE REQUISITOS DE SOFTWARE
 
-# VISÃO GERAL
+---
 
-O Sistema de Gerenciamento de Estoque e Manutenção de Maquinários é uma solução completa para o controle de ativos. Ele permite aos usuários gerenciar o estoque de produtos, a frota de maquinários e o registro de colaboradores.
+## VISÃO GERAL
+
+O Sistema de Gerenciamento de Estoque e Manutenção de Maquinários é uma solução web para o controle de ativos. Ele permite aos usuários gerenciar o estoque de produtos, a frota de maquinários, o cadastro de responsáveis e o agendamento de manutenções de forma centralizada.
+
+---
 
 ## OBJETIVOS DO PROJETO
 
-1. Gerenciar o estoque de itens
-2. Gerenciar a frota de maquinários
-3. Gerenciar o acesso de colaboradores ao sistema
-4. Fornecer relatórios
-5. Ter uma página dedicada para dashboards
+- Gerenciar o estoque de itens e produtos.
+- Gerenciar a frota de maquinários, incluindo seus status operacionais.
+- Gerenciar o cadastro de colaboradores responsáveis pelas manutenções.
+- Permitir o agendamento e controle de manutenções.
+- Fornecer uma visão geral do sistema através de um dashboard.
+
+---
 
 ## REQUISITOS FUNCIONAIS
 
-RF1 - O sistema deve permitir o cadastro de itens do estoque<br/>
-RF2 - O sistema deve permitir a busca de itens do estoque<br/>
-RF3 - O sistema deve permitir a atualização de informações de itens do estoque<br/>
-RF4 - O sistema deve permitir exclusão de itens do estoque<br/>
-RF5 - O sistema deve permitir o cadastro de maquinários do estoque<br/>
-RF6 - O sistema deve permitir a busca de maquinários do estoque<br/>
-RF7 - O sistema deve permitir a atualização de informações de maquinários do estoque<br/>
-RF8 - O sistema deve permitir exclusão de maquinários do estoque<br/>
-RF9 - O sistema deve disponibilizar ao usuário uma forma de ativar ou desativar um maquibário da frota, alterando seu status.<br/>
-~~RF10 - O sistema deve permitir o cadastro ou remoção de colaboradores, desde que o mesmo seja feito pelos usuários com as devidas permissões.~~<br/>
-~~RF11 - O sistema deve fornecer relatórios sobre informações relevantes sobre o sistema.~~<br/>
-RF12 - O sistema deve ter uma página de dashboards dedicada a apresentação de informações.<br/>
-RF13 - O sistema deve ter uma página de maquinário dedicada a apresentação de informações.<br/>
-RF14 - O sistema deve ter uma página de estoque dedicada a apresentação de informações.<br/>
+### Módulo de Estoque
+- **RF01** - O sistema deve permitir o cadastro de novos produtos no estoque.
+- **RF02** - O sistema deve permitir a busca de produtos no estoque.
+- **RF03** - O sistema deve permitir a atualização de informações dos produtos (ex: quantidade, estoque mínimo).
+- **RF04** - O sistema deve permitir a exclusão de produtos do estoque.
+
+### Módulo de Maquinários
+- **RF05** - O sistema deve permitir o cadastro de maquinários na frota.
+- **RF06** - O sistema deve permitir a busca de maquinários.
+- **RF07** - O sistema deve permitir a atualização de informações dos maquinários.
+- **RF08** - O sistema deve permitir a exclusão de maquinários.
+- **RF09** - O sistema deve permitir a alteração do status de um maquinário (ex: OPERACIONAL, EM MANUTENÇÃO).
+
+### Módulo de Responsáveis
+- **RF10** - O sistema deve permitir o cadastro de responsáveis.
+- **RF11** - O sistema deve permitir a edição e exclusão de responsáveis.
+
+### Módulo de Manutenção
+- **RF12** - O sistema deve permitir o agendamento de novas manutenções, associando um maquinário a um responsável.
+- **RF13** - O sistema deve permitir a atualização e exclusão de manutenções.
+
+### Interface e Visualização
+- **RF14** - O sistema deve ter uma página de dashboard para apresentação de dados agregados.
+- **RF15** - O sistema deve ter páginas dedicadas para o gerenciamento de Maquinários, Estoque, Responsáveis e Manutenções.
+
+---
 
 ## REQUISITOS DE QUALIDADE
 
-RQ1 - **[SEGURANÇA]** O Sistema deve guardar as informações dos colaboradores de maneira segura, respeitando a LGPD.<br/>
-RQ2 - **[DISPONIBILIDADE]** O Sistema deve estar disponível 99,9% do tempo, com no máximo 5 minutos de inoperabilidade, salvo seja por manutenções programadas.<br/>
-RQ3 - **[PERFORMANCE]** O sistema deve apresentar todas as informações em no máximo 0,3 segudnos ao usuário, independente de qual infromação ele esteja requisitando.<br/>
+- **RQ1** - [SEGURANÇA] O Sistema deve guardar as informações dos colaboradores de maneira segura, respeitando a LGPD.
+- **RQ2** - [DISPONIBILIDADE] O Sistema deve estar disponível 99,9% do tempo, com no máximo 5 minutos de inoperabilidade, salvo seja por manutenções programadas.
+- **RQ3** - [PERFORMANCE] O sistema deve apresentar todas as informações em no máximo 0,3 segundos ao usuário, independente de qual informação ele esteja requisitando.
 
-## REGRAS DE NEGOCIO
+---
 
-RN1 - Um item do estoque não pode ser negativo<br/>
-RN2 - Não deve haver duplicidade de itens ou maquinários<br/>
-RN3 - Um maquinário deve, obrigatóriamente, ter um registro de manutenção a cada 250 horas<br/>
-RN4 - Somente colaboradores do tipo "Master" ou "Adiministrador" podem criar ou desativar cadastros<br/>
-RN5 - A quantidade mínima de um item para notificação é de 10 unidades<br/>
+## REGRAS DE NEGÓCIO
+
+- **RN1** - A quantidade de um item no estoque não pode ser negativa.
+- **RN2** - Não deve haver duplicidade de maquinários (pelo `numeroSerie`) ou responsáveis (pelo `cpf` e `email`).
+- **RN3** - A quantidade mínima de um item para notificação visual de "estoque baixo" é de 10 unidades.
+- **RN4** - Para agendar uma manutenção, é obrigatório associar um maquinário e um responsável existentes.
+
+---
 
 ## CRONOGRAMA DE DESENVOLVIMENTO
 
+> *(O cronograma original foi mantido para registro histórico do planejamento.)*
+
 ### MODELAGEM
-|ATIVIDADE|PREVISAO DE TERMINO|RESPONSAVEL|
-|---|---|---|
-|DEFINIO DOS REQUISITOS | 18/07 | CARLOS |
-|DIAGRAMA DE CASOS DE USO | 18/07 | CARLOS |
-|DOCUMENTAÇÃO DA ARQUITETURA DO SISTEMA| 18/07| CARLOS |
-|DIAGRAMA DE ARQUITETURA | 18/07 | CARLOS |
-|DIAGRAMA DE CLASSES REFINADO| 18/07 | CARLOS |
-|DIAGRAMA DE SEQUENCIA | 18/07 | CARLOS |
-|DIAGRAMA ENTIDADE RELACIONAMENTO | 19/07 | CARLOS |
-|DICIONARIO DE DADOS | 19/07| CARLOS |
-|MAPEAMENTO ENTIDADE RELACIONAMENTO | 19/07| CARLOS |
-|PROTOTIPO DAS TELAS | 19/07| CARLOS |
+
+| ATIVIDADE                                 | PREVISÃO DE TÉRMINO | RESPONSÁVEL |
+|------------------------------------------|---------------------|-------------|
+| DEFINIÇÃO DOS REQUISITOS                 | 18/07               | CARLOS      |
+| DIAGRAMA DE CASOS DE USO                 | 18/07               | CARLOS      |
+| DOCUMENTAÇÃO DA ARQUITETURA DO SISTEMA   | 18/07               | CARLOS      |
+| DIAGRAMA DE ARQUITETURA                  | 18/07               | CARLOS      |
+| DIAGRAMA DE CLASSES REFINADO             | 18/07               | CARLOS      |
+| DIAGRAMA DE SEQUENCIA                    | 18/07               | CARLOS      |
+| DIAGRAMA ENTIDADE RELACIONAMENTO         | 19/07               | CARLOS      |
+| DICIONÁRIO DE DADOS                      | 19/07               | CARLOS      |
+| MAPEAMENTO ENTIDADE RELACIONAMENTO       | 19/07               | CARLOS      |
+| PROTÓTIPO DAS TELAS                      | 19/07               | CARLOS      |
 
 ### IMPLEMENTAÇÃO DA SOLUÇÃO
-|ATIVIDADE|PREVISAO DE TERMINO|RESPONSAVEL|
-|---|---|---|
-|CRIAÇÃO DO PROJETO| 20/07 | CARLOS |
-|CRUD ITENS E MAQUINARIOS| 21/07 | CARLOS |
-|CRIAÇÃO DO DASHBOARD | 22/07 | CARLOS |
-|CRIAÇÃO DAS CRIAÇÃO DAS TELAS DE MAQUINÁRIOS | 24/07 | CARLOS |
-|CRIAÇÃO DAS CRIAÇÃO DAS TELAS DE ESTOQUE | 24/07 | CARLOS |
-|INTEGRAÇÃO BACKEND COM FRONTEND | 27/07 | CARLOS |
-|REFINAMENTO E TESTES | 27/07 | CARLOS |
-| APRESENTAÇÃO | 28/07 | CARLOS |
 
-## STACKS
+| ATIVIDADE                             | PREVISÃO DE TÉRMINO | RESPONSÁVEL |
+|--------------------------------------|---------------------|-------------|
+| CRIAÇÃO DO PROJETO                   | 20/07               | CARLOS      |
+| CRUD ITENS E MAQUINÁRIOS             | 21/07               | CARLOS      |
+| CRIAÇÃO DO DASHBOARD                 | 22/07               | CARLOS      |
+| CRIAÇÃO DAS TELAS DE MAQUINÁRIOS     | 24/07               | CARLOS      |
+| CRIAÇÃO DAS TELAS DE ESTOQUE         | 24/07               | CARLOS      |
+| INTEGRAÇÃO BACKEND COM FRONTEND      | 27/07               | CARLOS      |
+| REFINAMENTO E TESTES                 | 27/07               | CARLOS      |
+| APRESENTAÇÃO                         | 28/07               | CARLOS      |
 
-Tipo de aplicação: WEB local<br/>
-Tecnologia frontend: NextJS<br/>
-Tecnologia backend: Java ou Typescript<br/>
-Modelo de persistência: Hibrido (SQL e NoSQL)<br/>
-Banco de dados: PostgreSQL e MongoDB<br/>
-Gerenciamento de entregas: Trello<br/>
+---
+
+## STACKS (TECNOLOGIAS UTILIZADAS)
+
+- **Tipo de aplicação**: Aplicação Web (SPA)
+- **Tecnologia frontend**: Next.js, React, TypeScript
+- **Tecnologia backend**: Node.js, Express, TypeScript
+- **Modelo de persistência**: NoSQL
+- **Banco de dados**: MongoDB com Mongoose (ODM)
+- **Mensageria / Cache**: Redis (para arquitetura Pub/Sub)
+- **Gerenciamento de entregas**: Trello

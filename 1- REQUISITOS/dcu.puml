@@ -1,54 +1,23 @@
 @startuml Diagrama de Casos de Uso
 
-title Diagrama de Casos de Uso
+title Diagrama de Casos de Uso (Versão Simplificada)
 
 left to right direction
 
-' Definição dos atores'
-actor Usuario as "Usuário"
-actor Administrador as "Administrador"
+actor "Colaborador" as user
 
-' O Administrador é um tipo de Usuário, por isso ele herda as ações'
-' Essa generalização limpa o diagrama, pois o Administrador não precisa de todas as linhas do Usuário'
-Administrador <|-- Usuario
-
-' Agrupando casos de uso com packages para melhor organização e semântica'
-rectangle "Ações do Sistema" {
-  usecase "Visualizar dashboard" as Dashboard
-  usecase "Visualizar maquinarios" as Maquinarios
-  usecase "Visualizar itens" as Itens
-  usecase "Visualizar movimentação" as Movimentacao
+rectangle "Sistema de Gestão de Manutenção" {
+  usecase "Gerenciar Maquinários" as UC1
+  usecase "Gerenciar Responsáveis" as UC2
+  usecase "Gerenciar Estoque" as UC3
+  usecase "Gerenciar Manutenções" as UC4
+  usecase "Visualizar Dashboard" as UC5
 }
 
-rectangle "Ações de Ativos" {
-  usecase "CRUD de Itens" as CRUDItens
-  usecase "CRUD de Maquinarios" as CRUDMaquinarios
-}
-
-rectangle "Ações de Gestão" {
-  usecase "Ajustar Estoque" as AjustarEstoque
-  usecase "Registrar Entrada/Saída" as MovimentacaoProduto
-  usecase "Gerenciar Manutenção" as Manutencao
-}
-
-rectangle "Ações de Usuários" {
-  usecase "Gerenciar Acessos" as Acesso
-}
-
-' Relacionamentos mais limpos'
-Usuario --> Dashboard
-Usuario --> Maquinarios
-Usuario -up-> Itens
-Usuario --> Movimentacao
-
-Usuario --> MovimentacaoProduto
-Usuario --> AjustarEstoque
-Usuario --> CRUDItens
-Usuario --> CRUDMaquinarios
-Usuario --> Manutencao
-
-' As ações específicas do Administrador
-' Ele herda as ações do Usuario, então só precisamos mapear as exclusivas dele'
-Administrador -up-> Acesso
+user --> UC1
+user --> UC2
+user --> UC3
+user --> UC4
+user --> UC5
 
 @enduml

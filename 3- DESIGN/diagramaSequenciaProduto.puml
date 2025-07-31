@@ -1,43 +1,44 @@
-@startuml
+@startuml Fluxo de Cadastro de Item de Estoque
 
-title "Fluxo de controle de uso do CRUD de produtos do estoque"
+title "Fluxo de Controle - CRUD de Item de Estoque"
 
+actor "Usuário" as usr
+participant "EstoquePage" as page
+participant "EstoqueController" as controller
+participant "EstoqueRepository" as repository
+database "MongoDB" as db
+participant "RedisPublisher" as publisher
+queue "Redis" as redis
 
-<style>
-    database {
-        backgroundColor: RoyalBlue;
-    }
-</style>
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 10
 
-actor "Usuario" as usr
+usr -> page: Preenche e envia formulário
+activate page
 
-entity "EstoquePage" as estqP
-entity "EstoqueController" as estqC
-entity "EstoqueRepository" as estqR
+page -> controller: POST /api/estoque
+activate controller
 
-database "Banco de Dados" as db
+controller -> repository: addOrUpdateProdutoEstoque(dados)
+activate repository
 
+repository -> db: findOneAndUpdate(...)
+activate db
+db --> repository: estoqueAtualizado
+deactivate db
 
-usr -> estqP: Acessa a página
-activate usr
-activate estqP
-usr <--  estqP: <<render>>
+repository -> publisher: publishOperation("UPDATE", estoqueAtualizado)
+activate publisher
+publisher -> redis: PUBLISH crud-channel
+deactivate publisher
 
-usr -> estqP: SubmeteFormulario
-estqP -> estqC: ProcessaRequisição (Método HTTP)
-activate estqC
-estqC -> estqR: ValidaRequisição
-activate estqR
-estqR -> db: ExecutaOperacao
-estqR <-- db: RetornarStatus
-estqC <-- estqR: RetornarStatus
-deactivate estqR
-estqP <-- estqC: RetornarStatus
-deactivate estqC
+repository --> controller: retorna estoqueAtualizado
+deactivate repository
 
-estqP --> usr: MensagemSucesso
+controller --> page: 201 Created / 200 OK
+deactivate controller
 
-deactivate usr
-deactivate estqP
+page --> usr: Exibe mensagem de sucesso
+deactivate page
 
 @enduml

@@ -6,7 +6,7 @@ Esta seção detalha a estrutura e a definição dos dados do **Sistema de Geren
 
 O diagrama a seguir representa visualmente as tabelas do nosso banco de dados relacional, suas colunas e como elas se conectam através de chaves primárias e estrangeiras. Ele é a planta baixa da nossa camada de dados.
 
-![Modelo Entidade-Relacionamento](./mer.png)
+![Modelo Entidade-Relacionamento](./MER_Sistema_Manutencao.png)
 
 ---
 

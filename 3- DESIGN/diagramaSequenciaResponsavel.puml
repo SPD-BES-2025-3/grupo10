@@ -1,11 +1,11 @@
-@startuml Fluxo de Cadastro de Maquinário
+@startuml Fluxo de Cadastro de Responsável
 
-title "Fluxo de Controle - CRUD de Maquinário"
+title "Fluxo de Controle - CRUD de Responsável"
 
 actor "Usuário" as usr
-participant "MaquinarioPage" as page
-participant "MaquinarioController" as controller
-participant "MaquinarioRepository" as repository
+participant "ResponsavelPage" as page
+participant "ResponsavelController" as controller
+participant "ResponsavelRepository" as repository
 database "MongoDB" as db
 participant "RedisPublisher" as publisher
 queue "Redis" as redis
@@ -16,23 +16,23 @@ skinparam roundcorner 10
 usr -> page: Preenche e envia formulário
 activate page
 
-page -> controller: POST /api/maquinario
+page -> controller: POST /api/responsavel
 activate controller
 
 controller -> repository: create(dados)
 activate repository
 
-repository -> db: save(maquinario)
+repository -> db: save(responsavel)
 activate db
-db --> repository: maquinarioCriado
+db --> repository: responsavelCriado
 deactivate db
 
-repository -> publisher: publishOperation("CREATE", maquinarioCriado)
+repository -> publisher: publishOperation("CREATE", responsavelCriado)
 activate publisher
 publisher -> redis: PUBLISH crud-channel
 deactivate publisher
 
-repository --> controller: retorna maquinarioCriado
+repository --> controller: retorna responsavelCriado
 deactivate repository
 
 controller --> page: 201 Created

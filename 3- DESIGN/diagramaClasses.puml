@@ -1,81 +1,61 @@
-@startuml
-title Diagrama de Classes - Sistema de Estoque e Frota (Final)
+@startuml Diagrama de Classes
 
-' --- ENUMS ---
-enum TipoMaquinario {
-  TRATOR
-  EMPILHADEIRA
-  RETROESCAVADEIRA
-  GUINDASTE
-  OUTRO
-}
+title Diagrama de Classes do Sistema (MongoDB/Mongoose)
 
-enum StatusManutencao {
-  AGENDADA
-  EM_ANDAMENTO
-  CONCLUIDA
-  CANCELADA
-}
-
-' --- CLASSES PRINCIPAIS ---
-class Produto {
-  - id: UUID
-  - nome: String
-  - descricao: String
-  - codigoItem: String
-  - quantidade: int
-  - unidadeMedida: String
-  - precoCusto: double
-  - estoqueMinimo: int
-}
+skinparam classAttributeIconSize 0
 
 class Maquinario {
-  - id: UUID
-  - tipo: TipoMaquinario
-  - marca: String
-  - modelo: String
-  - anoFabricacao: int
-  - numeroSerie: String
-  - status: String
-}
-
-class Fornecedor {
-  - id: UUID
-  - nome: String
-  - cnpj: String
-  - contato: String
-  - endereco: String
-}
-
-class Manutencao {
-  - id: UUID
-  - descricao: String
-  - dataAgendada: Date
-  - dataRealizada: Date
-  - status: StatusManutencao
-  - custoEstimado: double
+  + _id: ObjectId
+  + tipo: String
+  + marca: String
+  + modelo: String
+  + numeroSerie: String
+  + anoFabricacao: Number
+  + status: String
 }
 
 class Responsavel {
-  - id: UUID
-  - nome: String
-  - email: String
-  - telefone: String
+  + _id: ObjectId
+  + nome: String
+  + cpf: String
+  + email: String
+  + telefone: String
+  + cargo: String
 }
 
-' --- RELACIONAMENTOS ---
-Fornecedor "1" --> "*" Produto : fornece
-Fornecedor "1" --> "*" Maquinario : fabrica
-
-Maquinario "1" --> "*" Manutencao : tem
-
-Responsavel "1" --> "*" Manutencao : responsável por
-
-' --- TABELA INTERMEDIÁRIA PARA RELAÇÃO N-N ---
-class MaquinarioProduto {
-  - quantidadeUtilizada: int
+class Manutencao {
+  + _id: ObjectId
+  + titulo: String
+  + observacao: String
+  + dataAgendada: Date
+  + dataRealizada: Date
+  + status: String
+  + custoEstimado: Number
 }
-Maquinario "1" -- "*" MaquinarioProduto
-Produto "1" -- "*" MaquinarioProduto
+
+class Produto {
+  + _id: ObjectId
+  + nome: String
+  + descricao: String
+  + codigoItem: String
+  + precoUnitario: Number
+  + categoria: String
+}
+
+class Estoque {
+  + _id: ObjectId
+  + nomeInventario: String
+}
+
+class "Item de Estoque" as EstoqueItem {
+  + quantidade: Number
+  + estoqueMinimo: Number
+}
+
+Maquinario "1" -- "0..*" Manutencao : "possui"
+Responsavel "1" -- "0..*" Manutencao : "é responsável por"
+
+Estoque "1" -- "0..*" EstoqueItem : "contém"
+Produto "1" -- "1" EstoqueItem : "é o"
 
 @enduml

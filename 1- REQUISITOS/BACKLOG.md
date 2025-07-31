@@ -1,9 +1,11 @@
 # BACKLOG DO PRODUTO
 
-|REQUISITO|ATIVIDADE|GRAU DE IMPORTANCIA|PREVISAO DE TERMINO|STATUS|
-|---------|---------|-----------|------------------|---------|
-|RF1 A RF4|CRUD DE ITENS DO ESTOQUE |MUITO ALTO|20/07 A 21/07| FEITO |
-|RF5 A RF9|CRUD DE MAQUINARIOS DA FROTA E STATUS|MUITO ALTO|21/07 A 22/07| FEITO |
-|RF12|CRUD DA TELA INICIAL E DASHBOARD |ALTO|22/07| EM ANDAMENTO | 
-|RF13|CRIAÇÃO DAS TELAS DE MAQUINARIOS|ALTO|23/07 A 24/07| EM ANDAMENTO |
-|RF14|CRIAÇÃO DAS TELAS DE ITENS|ALTO|23/07 A 24/03| A FAZER | 
+| REQUISITO | ATIVIDADE                             | GRAU DE IMPORTÂNCIA | PREVISÃO DE TÉRMINO | STATUS       |
+|-----------|----------------------------------------|----------------------|----------------------|--------------|
+| RF-01     | CRUD de Responsáveis                  | MUITO ALTO           | 20/07                | FEITO        |
+| RF-02     | CRUD de Maquinários                   | MUITO ALTO           | 22/07                | FEITO        |
+| RF-03     | CRUD de Itens no Estoque              | MUITO ALTO           | 24/07                | FEITO        |
+| RF-04     | CRUD de Manutenções                   | MUITO ALTO           | 26/07                | FEITO        |
+| RF-05     | Integração com Redis (Pub/Sub)        | ALTO                 | 28/07                | FEITO        |
+| RF-06     | Criação do Dashboard Inicial          | ALTO                 | 30/07                | FEITO        |
+| RF-07     | Implementação de Testes (Backend)     | MÉDIO                | 31/07    

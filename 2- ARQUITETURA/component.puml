@@ -1,38 +1,28 @@
-@startuml
-!theme vibrant
-!include <C4/C4_Container>
-!include <C4/C4_Component>
+@startuml C4_Component
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
 
-title "Diagrama de Componentes (C4 - Nível 3) - Layout Organizado"
+title Diagrama de Componentes da API Backend
 
-System_Boundary(SEM, "SISTEMA DE ESTOQUE E FROTA DE MAQUINÁRIOS") {
+Container_Boundary(backend, "API Backend") {
+    Component(routes, "Routes", "Express.js", "Define os endpoints da API (ex: /api/manutencao) e direciona para os controllers.")
     
-    Container(SPA, "Aplicação Web", "Next.js / React", "Interface do usuário interativa que permite o gerenciamento completo do sistema.")
+    Component(controllers, "Controllers", "TypeScript", "Recebem as requisições, validam os dados de entrada e orquestram as operações.")
+    
+    Component(repositories, "Repositories", "TypeScript", "Encapsula a lógica de acesso ao banco de dados (Mongoose) e a publicação de eventos.")
+    
+    Component(models, "Models", "Mongoose", "Define os schemas e a estrutura dos documentos no MongoDB.")
 
-    Container_Boundary(API, "API RESTful") {
-        ' Componentes que interagem com o banco de dados relacional
-        Component(MaquinarioController, "MaquinarioController", "Node.js / Express", "Gerencia o CRUD dos dados cadastrais dos maquinários.")
-        Component(ResponsavelController, "ResponsavelController", "Node.js / Express", "Gerencia o CRUD de funcionários responsáveis.")
-        Component(EstoqueController, "EstoqueController", "Node.js / Express", "Gerencia o CRUD de itens e peças no estoque.")
-        
-        ' Componente que interage com o banco de dados NoSQL
-        Component(ManutencaoController, "ManutencaoController", "Node.js / Express", "Gerencia o histórico e o agendamento de manutenções.")
-    }
-
-    ContainerDb(PostgreSQL, "Banco de Dados Relacional", "PostgreSQL", "Armazena dados estruturados (Maquinários, Responsáveis, Itens).")
-    ContainerDb(MongoDB, "Banco de Dados NoSQL", "MongoDB", "Armazena dados flexíveis (Registros de Manutenção).")
+    Component(redis_publisher, "Redis Publisher", "TypeScript / node-redis", "Componente responsável por enviar mensagens para o Redis.")
 }
 
-' Relacionamento principal, de cima para baixo
-Rel_D(SPA, API, "Faz requisições à API", "HTTP/JSON")
+ContainerDb(database, "Banco de Dados", "MongoDB")
+Container(redis, "Barramento de Eventos", "Redis")
 
-' Relacionamentos dos componentes com os bancos de dados, forçando a direção para baixo
-Rel_Down(MaquinarioController, PostgreSQL, "Lê/Escreve em", "ORM (Prisma/TypeORM)")
-Rel_Down(ResponsavelController, PostgreSQL, "Lê/Escreve em", "ORM (Prisma/TypeORM)")
-Rel_Down(EstoqueController, PostgreSQL, "Lê/Escreve em", "ORM (Prisma/TypeORM)")
-Rel_Down(ManutencaoController, MongoDB, "Lê/Escreve em", "ODM (Mongoose)")
-
-' Relação interna entre componentes, forçando a direção para a direita
-Rel_Right(MaquinarioController, ManutencaoController, "Consulta histórico")
+Rel(routes, controllers, "Chama")
+Rel(controllers, repositories, "Utiliza")
+Rel(repositories, models, "Usa")
+Rel(repositories, database, "Executa queries", "Mongoose")
+Rel(repositories, redis_publisher, "Envia evento para publicar")
+Rel(redis_publisher, redis, "Publica mensagem", "TCP")
 
 @enduml

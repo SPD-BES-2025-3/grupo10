@@ -1,53 +1,60 @@
-@startuml
-title MER - Sistema de Estoque e Frota
+@startuml MER_Sistema_Manutencao
 
-entity "Usuário" as Usuario {
-  * id : UUID
+title "MER - Sistema de Gestão de Manutenção (MongoDB)"
+
+entity "Responsavel" as Responsavel {
+  * **_id : ObjectId**
   --
-  nome : String
-  email : String
-  perfil : PerfilUsuario
+  * nome : String
+  * cpf : String
+  * email : String
+  * cargo : String
+  telefone : String
+}
+
+entity "Maquinario" as Maquinario {
+  * **_id : ObjectId**
+  --
+  * tipo : String
+  * marca : String
+  * modelo : String
+  * numeroSerie : String
+  * anoFabricacao : Number
+  * status : String
+}
+
+entity "Manutencao" as Manutencao {
+  * **_id : ObjectId**
+  --
+  * titulo : String
+  * observacao : String
+  * dataAgendada : Date
+  * status : String
+  * custoEstimado : Number
+  dataRealizada : Date
+}
+
+entity "Estoque" as Estoque {
+    * **_id : ObjectId**
+    --
+    * nomeInventario : String
+    * itens : Array
 }
 
 entity "Produto" as Produto {
-  * id : UUID
+  * **_id : ObjectId**
   --
-  nome : String
+  * nome : String
+  * precoUnitario : Number
+  categoria: String
   descricao : String
   codigoItem : String
-  quantidade : int
-  unidadeMedida : String
-  precoCusto : double
 }
 
-entity "Maquinário" as Maquinario {
-  * id : UUID
-  --
-  tipo : TipoMaquinario
-  marca : String
-  modelo : String
-  anoFabricacao : int
-  numeroSerie : String
-}
+' Relacionamentos
+Maquinario "1" -- "0..*" Manutencao : possui
+Responsavel "1" -- "0..*" Manutencao : é responsável por
 
-entity "Fornecedor" as Fornecedor {
-  * id : UUID
-  --
-  nome : String
-  cnpj : String
-  contato : String
-  endereco : String
-}
-
-' Relacionamentos com cardinalidade
-
-Usuario ||--o{ Maquinario : "responsável por"
-
-Fornecedor ||--o{ Produto : "fornece"
-
-Fornecedor ||--o{ Maquinario : "fornece"
-
-Produto }|--|| Maquinario : "associado a" 
+Estoque "1" -- "0..*" Produto : cataloga
 
 @enduml
-

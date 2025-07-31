@@ -1,12 +1,13 @@
-@startuml
+@startuml C4_Context
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
 
-!include <C4/C4_Container>
-!include <C4/C4_Component>
+title Diagrama de Contexto do Sistema de Manutenção
 
-title Diagrama de contexto do SEM 
+Person(colaborador, "Colaborador", "Usuário que gerencia o estoque e as manutenções.")
+System(sistema, "Sistema de Gestão de Manutenção", "Plataforma web para controle de maquinários, estoque e agendamento de manutenções.")
+System_Ext(sistemas_externos, "Sistemas Externos", "Sistemas que podem consumir os eventos de alteração de dados.")
 
-Person(Usuario, "Colaborador", "Usuario utilizador do sistema")
-System(SistemaEstoqueMaquinario, "Sistema de Estoque e Maquinarios", "Sistema de Gerenciamento de Estoque e Frota de Maquinários")
-Rel(Usuario, SistemaEstoqueMaquinario, " [Utiliza]")
+Rel(colaborador, sistema, "Utiliza a interface web para gerenciar dados")
+Rel(sistema, sistemas_externos, "Publica eventos de CRUD (criação, atualização, exclusão)", "Redis Pub/Sub")
 
 @enduml

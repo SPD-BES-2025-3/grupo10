@@ -1,23 +1,44 @@
-@startuml
+@startuml Fluxo de Cadastro de Manutenção
+
 title "Fluxo de Controle - Cadastro de Manutenção"
 
 actor "Usuário" as usr
+participant "ManutencaoPage" as page
+participant "ManutencaoController" as controller
+participant "ManutencaoRepository" as repository
+database "MongoDB" as db
+participant "RedisPublisher" as publisher
+queue "Redis" as redis
 
-entity "ManutencaoPage" as page
-entity "ManutencaoController" as controller
-entity "ManutencaoService" as service
-entity "ManutencaoRepository" as repository
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 10
 
-usr -> page: Abre página de manutenção
-page --> usr: Exibe formulário
+usr -> page: Preenche e envia formulário
+activate page
 
-usr -> page: Envia dados do formulário
-page -> controller: Requisição de cadastro
-controller -> service: Valida e processa dados
-service -> repository: Salva manutenção
-repository --> service: Confirmação
-service --> controller: Sucesso
-controller --> page: Atualiza interface
-page --> usr: Mensagem de sucesso
+page -> controller: POST /api/manutencao
+activate controller
+
+controller -> repository: create(dados)
+activate repository
+
+repository -> db: save(manutencao)
+activate db
+db --> repository: manutencaoCriada
+deactivate db
+
+repository -> publisher: publishOperation("CREATE", manutencaoCriada)
+activate publisher
+publisher -> redis: PUBLISH crud-channel
+deactivate publisher
+
+repository --> controller: retorna manutencaoCriada
+deactivate repository
+
+controller --> page: 201 Created
+deactivate controller
+
+page --> usr: Exibe mensagem de sucesso
+deactivate page
 
 @enduml

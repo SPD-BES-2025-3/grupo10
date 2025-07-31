@@ -1,22 +1,23 @@
-@startuml
+@startuml C4_Container
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 
-!include <C4/C4_container>
-!include <C4/C4_Component>
+title Diagrama de Containers do Sistema de Manutenção
 
-Person(Usuario, "Colaborador", "Usuário do sistema via navegador")
+Person(colaborador, "Colaborador", "Usuário do sistema.")
 
-System_Boundary(SEM, "SISTEMA DE ESTOQUE E FROTA DE MAQUINÁRIO") {
-    Container(WebApp, "Aplicação Web", "NodeJS + TypeScript", "Entrega o SPA ao navegador")
-    Container(SPA, "SPA do Sistema", "Next.js", "Interface interativa com todas as funcionalidades")
-    Container(API, "API do Sistema", "Express + TypeScript", "Serviço backend com regras de negócio e acesso a dados")
-    SystemDb(PostgreSQL, "PostgreSQL / Supabase", "Banco relacional para dados estruturados")
-    SystemDb(MongoDB, "MongoDB / Atlas", "Banco NoSQL para dados flexíveis")
+System_Boundary(sistema_manutencao, "Sistema de Gestão de Manutenção") {
+    Container(frontend, "Aplicação Frontend", "Next.js, React, TypeScript", "Interface do usuário que roda no navegador.")
+    Container(backend, "API Backend", "Node.js, Express, TypeScript", "Processa a lógica de negócio e expõe uma API RESTful.")
+    ContainerDb(database, "Banco de Dados", "MongoDB", "Armazena os dados da aplicação (maquinários, responsáveis, manutenções, etc.).")
+    Container(redis, "Barramento de Eventos", "Redis", "Fila de mensagens para publicação de eventos no padrão Pub/Sub.")
 }
 
-Rel(Usuario, WebApp, "Acessa via navegador", "HTTPS")
-Rel_R(WebApp, SPA, "Entrega o conteúdo SPA", "HTTP")
-Rel(SPA, API, "Faz requisições à API", "HTTP/JSON")
-Rel(API, PostgreSQL, "Lê/Escreve dados estruturados", "String connection")
-Rel(API, MongoDB, "Lê/Escreve dados flexíveis", "String connection")
+System_Ext(sistemas_externos, "Sistemas Externos", "Consumidores dos eventos.")
+
+Rel(colaborador, frontend, "Acessa via navegador", "HTTPS")
+Rel(frontend, backend, "Faz requisições à API", "HTTPS/JSON")
+Rel(backend, database, "Lê e escreve dados", "Mongoose")
+Rel(backend, redis, "Publica eventos de CRUD", "TCP")
+Rel(redis, sistemas_externos, "Consome eventos", "TCP")
 
 @enduml

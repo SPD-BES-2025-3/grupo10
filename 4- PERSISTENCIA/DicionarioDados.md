@@ -1,41 +1,89 @@
-# USUARIO
+# Dicionário de Dados (MongoDB)
 
-| DADO     | DESCRIÇÃO                  | TIPO              |
-| -------- | -------------------------- | ----------------- |
-| UUID     | UUID do usuário            | varchar(32)       |
-| nome     | Nome do usuário do sistema | varchar(256)      |
-| email    | E-mail do usuário          | varchar(256)      |
-| perfil   | Tipo de perfil do usuário  | TipoPerfil (enum) |
+Este documento detalha as coleções e os campos utilizados no banco de dados MongoDB do sistema.
 
-# MAQUINARIO
+---
 
-| DADO | DESCRIÇÃO                                              | TIPO                        |
-| ------------ | ---------------------------------------------- | --------------------------- |
-|UUID          | UUID do maquinário                             | varchar(32)                 |
-|tipo          | Tipo do maquinario (ex: escavadeira)           | varchar(32)                 |
-|marca         | Marca do maquinario                            | varchar(32)                 |
-|modelo        | Modelo do maquinario                           | varchar(64)                 |
-|anoFabricacao | Ano de fabriação do maquinário, sem formatação | int                         |
-|numeroSerie   | Numero de serie do maquinario (opcional)       | varchar(64), NULL permitido |
+## Coleção: `responsaveis`
 
-# PRODUTO
+Armazena os dados dos colaboradores que podem ser responsáveis por manutenções.
 
-| DADO           | DESCRIÇÃO                                   | TIPO         |
-| -------------- | ------------------------------------------- | ------------ |
-| UUID           | UUID do produto                             | varchar(32)  |
-| nome           | Nome do produto                             | varchar(256) |
-| descricao      | Descrição do produto (máx 100 caracteres)   | varchar(256) |
-| codigoItem     | Código identificador do item (máx 15 chars) | varchar(16)  |
-| quantidadeItem | Quantidade disponível no estoque (não nulo) | int          |
-| unidadeMedida  | Unidade de medida (máx 8 caracteres)        | varchar(8)   |
-| precoCusto     | Preço do item (não nulo)                    | decimal      |
+| Campo       | Descrição                          | Tipo de Dado (Mongoose) | Observações                                  |
+|-------------|-------------------------------------|--------------------------|-----------------------------------------------|
+| _id         | Identificador único do documento    | ObjectId                | Chave primária, gerada automaticamente       |
+| nome        | Nome completo do responsável        | String                  | Obrigatório                                   |
+| cpf         | CPF do responsável                  | String                  | Obrigatório, Único                            |
+| email       | E-mail de contato do responsável    | String                  | Obrigatório, Único                            |
+| telefone    | Telefone de contato                 | String                  | Opcional                                      |
+| cargo       | Cargo do responsável                | String                  | Obrigatório, Enum                             |
+| createdAt   | Data de criação do registro         | Date                    | Gerado automaticamente                        |
+| updatedAt   | Data da última atualização          | Date                    | Gerado automaticamente                        |
 
-# FORNECEDOR
+---
 
-| DADO     | DESCRIÇÃO                | TIPO         |
-| -------  | ------------------------ | ------------ |
-| UUID     | UUID do fornecedor       | varchar(32)  |
-| nome     | Nome fantasia da empresa | varchar(256) |
-| cnpj     | CNPJ da empresa          | varchar(32)  |
-| contato  | Contato da empresa       | varchar(32)  |
-| endereco | Enredeço da empresa      | varchar(256) |
+## Coleção: `maquinarios`
+
+Armazena os dados de cada máquina da frota.
+
+| Campo         | Descrição                           | Tipo de Dado (Mongoose) | Observações               |
+|---------------|--------------------------------------|--------------------------|----------------------------|
+| _id           | Identificador único do documento     | ObjectId                | Chave primária             |
+| tipo          | Tipo do maquinário (ex: Trator)      | String                  | Obrigatório                |
+| marca         | Fabricante do maquinário             | String                  | Obrigatório                |
+| modelo        | Modelo específico do maquinário      | String                  | Obrigatório                |
+| numeroSerie   | Número de série único                 | String                  | Obrigatório, Único         |
+| anoFabricacao | Ano de fabricação                    | Number                  | Obrigatório                |
+| status        | Status operacional da máquina         | String                  | Obrigatório, Enum          |
+
+---
+
+## Coleção: `manutencoes`
+
+Armazena os registros de manutenção.
+
+| Campo          | Descrição                             | Tipo de Dado (Mongoose) | Observações                   |
+|----------------|----------------------------------------|--------------------------|--------------------------------|
+| _id            | Identificador único do documento       | ObjectId                | Chave primária                 |
+| titulo         | Título breve da manutenção             | String                  | Obrigatório                    |
+| observacao     | Descrição detalhada do serviço         | String                  | Obrigatório                    |
+| dataAgendada   | Data em que a manutenção foi agendada | Date                    | Obrigatório                    |
+| dataRealizada  | Data em que a manutenção foi concluída | Date                    | Opcional                       |
+| status         | Status atual da manutenção             | String                  | Obrigatório, Enum              |
+| custoEstimado  | Custo previsto para a manutenção       | Number                  | Obrigatório                    |
+| maquinario     | Referência ao maquinário               | ObjectId                | `ref: 'Maquinario'`            |
+| responsavel    | Referência ao responsável              | ObjectId                | `ref: 'Responsavel'`           |
+
+---
+
+## Coleção: `estoques` (Documento Único)
+
+Contém o inventário geral. Geralmente, haverá apenas um documento nesta coleção.
+
+| Campo     | Descrição                    | Tipo de Dado (Mongoose) | Observações               |
+|-----------|-------------------------------|--------------------------|----------------------------|
+| _id       | Identificador único do documento | ObjectId                | Chave primária             |
+| nome      | Nome do inventário           | String                  | Padrão: "Estoque Geral"    |
+| itens     | Array de itens no estoque    | Array\<Object\>         | Subdocumentos              |
+
+### Subdocumento: `itens`
+
+| Campo         | Descrição                         | Tipo de Dado (Mongoose) | Observações               |
+|---------------|------------------------------------|--------------------------|----------------------------|
+| produto       | Referência ao produto              | ObjectId                | `ref: 'Produto'`           |
+| quantidade    | Quantidade atual em estoque        | Number                  | Obrigatório                |
+| estoqueMinimo | Nível mínimo de alerta             | Number                  | Obrigatório                |
+
+---
+
+## Coleção: `produtos`
+
+Catálogo de todos os produtos que podem existir no estoque.
+
+| Campo         | Descrição                             | Tipo de Dado (Mongoose) | Observações               |
+|---------------|----------------------------------------|--------------------------|----------------------------|
+| _id           | Identificador único do documento       | ObjectId                | Chave primária             |
+| nome          | Nome do produto/peça                   | String                  | Obrigatório                |
+| descricao     | Descrição do produto                   | String                  | Opcional                   |
+| codigoItem    | Código único do produto (SKU)          | String                  | Único, Opcional            |
+| precoUnitario | Preço de custo do produto              | Number                  | Obrigatório                |
+| categoria     | Categoria do produto                   | String                  | Obrigatório, Enum          |
