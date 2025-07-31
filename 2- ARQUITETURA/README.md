@@ -77,18 +77,18 @@ Mesmo como um projeto inicial, o futuro crescimento é considerado:
 
 ### Nível 1: Diagrama de Contexto
 O sistema é utilizado por um **Colaborador** e agora se comunica de forma assíncrona com **Sistemas Externos** (como um possível integrador) através do barramento de eventos.
-![Diagrama de Contexto C4](./context.png)
+![Diagrama de Contexto C4](./C4_Context.png)
 
 ### Nível 2: Diagrama de Containers
 O sistema agora inclui o **Redis** como um container de primeira classe para mensageria. O banco de dados foi unificado para **MongoDB**.
-![Diagrama de Containers C4](./container.png)
+![Diagrama de Containers C4](./C4_Container.png)
 
 ### Nível 3: Diagrama de Componentes
 Dentro da API:
 - Os **controllers** interagem com os **repositórios**;
 - Os repositórios se comunicam com o **MongoDB**;
 - Após as operações de escrita, os repositórios utilizam um **Publisher** para enviar eventos ao **Redis**.
-![Diagrama de Componentes C4](./component.png)
+![Diagrama de Componentes C4](./C4_Component.png)
 
 ---
 

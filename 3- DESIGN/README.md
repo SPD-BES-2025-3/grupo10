@@ -6,7 +6,7 @@ Esta pasta contém os artefatos de design de baixo nível que detalham a estrutu
 
 O Diagrama de Classes a seguir detalha as principais entidades do domínio, seus atributos, e os relacionamentos entre elas. Ele serve como o projeto fundamental para a criação dos nossos *Models* na camada de persistência e das interfaces no código.
 
-![Diagrama de Classes do Sistema](./diagramaClasses.png)
+![Diagrama de Classes do Sistema](./Diagrama%20de%20Classes.png)
 
 ### Principais Entidades:
 
@@ -27,16 +27,22 @@ Os diagramas de sequência ilustram como os diferentes componentes do sistema co
 
 Este diagrama detalha o fluxo de interação para as operações de Criar, Ler, Atualizar e Deletar um maquinário, começando pela ação do usuário na interface até a operação no banco de dados.
 
-![Diagrama de Sequência para Maquinário](./diagramaSequenciaMaquinario.png)
+![Diagrama de Sequência para Maquinário](./Fluxo%20de%20Cadastro%20de%20Maquinário.png)
 
 ### 2.2. Fluxo de CRUD - Produto
 
 Similar ao fluxo de maquinário, este diagrama foca nas interações necessárias para gerenciar os itens do estoque (Produtos).
 
-![Diagrama de Sequência para Produto](./diagramaSequenciaProduto.png)
+![Diagrama de Sequência para Produto](./Fluxo%20de%20Cadastro%20de%20Item%20de%20Estoque.png)
 
 ### 2.3. Fluxo de CRUD - Manutenção
 
 Este diagrama ilustra o caso de uso específico de agendar ou registrar uma manutenção. Ele demonstra a interação entre as entidades `Maquinario`, `Responsavel` e `Manutencao`.
 
-![Diagrama de Sequência para Manutenção](./diagramaSequenciaManutencao.png)
+![Diagrama de Sequência para Manutenção](./Fluxo%20de%20Cadastro%20de%20Manutenção.png)
+
+### 2.4. Fluxo de CRUD - Responsavel
+
+Este diagrama ilustra o caso de interação para gerenciar responsáveis.
+
+![Diagrama de Sequência para Responsavel](./Fluxo%20de%20Cadastro%20de%20Responsável.png)
