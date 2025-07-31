@@ -8,4 +8,4 @@
 | RF-04     | CRUD de Manutenções                   | MUITO ALTO           | 26/07                | FEITO        |
 | RF-05     | Integração com Redis (Pub/Sub)        | ALTO                 | 28/07                | FEITO        |
 | RF-06     | Criação do Dashboard Inicial          | ALTO                 | 30/07                | FEITO        |
-| RF-07     | Implementação de Testes (Backend)     | MÉDIO                | 31/07    
+| RF-07     | Implementação de Testes (Backend)     | MÉDIO                | 31/07                | FEITO        |
