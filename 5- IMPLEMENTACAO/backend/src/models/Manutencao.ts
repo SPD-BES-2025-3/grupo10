@@ -1,5 +1,5 @@
 // models/Manutencao.ts
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 
 export interface IManutencao extends Document {
     titulo: string;

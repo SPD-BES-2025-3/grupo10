@@ -29,33 +29,45 @@ class EstoqueController {
 
     storage: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { produtoId, codigoItem, quantidade, estoqueMinimo, nome, precoUnitario } = req.body;
-            const nomeInventario = "Estoque Geral";
-
-            const response = await EstoqueRepository.addOrUpdateProdutoEstoque(
-                { produtoId, codigoItem, nome, precoUnitario },
+            const {
+                produtoId,
+                codigoItem,
+                nome,
+                precoUnitario,
+                categoria, // Incluído categoria
                 quantidade,
                 estoqueMinimo,
-                nomeInventario
+            } = req.body;
+
+            const response = await EstoqueRepository.addOrUpdateProdutoEstoque(
+                { produtoId, codigoItem, nome, precoUnitario, categoria }, // Passa categoria
+                quantidade,
+                estoqueMinimo
             );
 
             return res.status(201).json(response) as unknown as void;
         } catch (error) {
-            next(error);
+            console.error("Erro ao armazenar produto no estoque:", error); // Log mais específico
+            next(error); // Passa o erro para o próximo middleware de erro
         }
     }
 
     update: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const produtoId = req.params.id;
-            const { codigoItem, quantidade, estoqueMinimo, nome, precoUnitario } = req.body;
-            const nomeInventario = "Estoque Geral";
-
-            const response = await EstoqueRepository.addOrUpdateProdutoEstoque(
-                { produtoId, codigoItem, nome, precoUnitario },
+            const produtoId = req.params.id; // O ID na URL é o _id real do produto
+            const {
+                codigoItem,
+                nome,
+                precoUnitario,
+                categoria, // Incluído categoria
                 quantidade,
                 estoqueMinimo,
-                nomeInventario
+            } = req.body;
+
+            const response = await EstoqueRepository.addOrUpdateProdutoEstoque(
+                { produtoId, codigoItem, nome, precoUnitario, categoria }, // Passa categoria
+                quantidade,
+                estoqueMinimo
             );
 
             if (!response) {
@@ -64,7 +76,8 @@ class EstoqueController {
 
             return res.status(200).json(response) as unknown as void;
         } catch (error) {
-            next(error);
+            console.error("Erro ao atualizar produto no estoque:", error); // Log mais específico
+            next(error); // Passa o erro para o próximo middleware de erro
         }
     }
 

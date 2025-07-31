@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { Estoque, IEstoqueGeralProps, IEstoqueProps } from "../models/Estoque";
 import { Produto, IProdutoProps } from "../models/Produto";
-import RedisPublisher from '../events/redisPublisher'; // 1. Importa o publicador
+import RedisPublisher from '../events/redisPublisher';
 
 class EstoqueRepository {
     async findEstoqueGeral(nomeInventario: string = "Estoque Geral"): Promise<IEstoqueGeralProps | null> {
@@ -73,8 +73,8 @@ class EstoqueRepository {
 
     async sumTotalValueEstoque(): Promise<number> {
         const sum = await Estoque.aggregate([
-            { $match: { nomeInventario: "Estoque Geral" } }, 
-            { $unwind: "$itens" }, 
+            { $match: { nomeInventario: "Estoque Geral" } },
+            { $unwind: "$itens" },
             { $lookup: { from: "produtos", localField: "itens.produto", foreignField: "_id", as: "produtoInfo" } },
             { $unwind: "$produtoInfo" },
             { $group: { _id: "$_id", valorTotal: { $sum: { $multiply: ["$itens.quantidade", "$produtoInfo.precoUnitario"] } } } }
@@ -83,63 +83,90 @@ class EstoqueRepository {
     }
 
     async addOrUpdateProdutoEstoque(
-        produtoData: { produtoId?: string; codigoItem?: string; nome?: string; precoUnitario?: number; },
-        quantidade: number,
-        estoqueMinimo: number,
-        nomeInventario: string = "Estoque Geral"
-    ): Promise<IEstoqueGeralProps> {
-        try {
-            let actualProductId: mongoose.Types.ObjectId;
+    produtoData: {
+        produtoId?: string;
+        codigoItem?: string;
+        nome?: string;
+        precoUnitario?: number;
+        categoria?: string; // Adicionado categoria
+    },
+    quantidade: number,
+    estoqueMinimo: number
+): Promise<IEstoqueGeralProps> {
+    try {
+        let produtoExistente;
 
-            if (produtoData.produtoId) {
-                actualProductId = new mongoose.Types.ObjectId(produtoData.produtoId);
-            } else if (produtoData.codigoItem) {
-                let produtoExistente = await Produto.findOne({ codigoItem: produtoData.codigoItem });
-                if (!produtoExistente) {
-                    if (!produtoData.nome || !produtoData.precoUnitario) {
-                        throw new Error("Nome e Preço Unitário são obrigatórios para criar um novo produto com CodigoItem.");
-                    }
-                    produtoExistente = await Produto.create({
-                        nome: produtoData.nome,
-                        codigoItem: produtoData.codigoItem,
-                        precoUnitario: produtoData.precoUnitario
-                    });
-                }
-                actualProductId = produtoExistente._id as mongoose.Types.ObjectId;
-            } else {
-                throw new Error("É necessário fornecer um produtoId ou um codigoItem.");
-            }
-
-            let estoqueFinal = await Estoque.findOneAndUpdate(
-                { nomeInventario, "itens.produto": actualProductId },
-                { "$set": { "itens.$.quantidade": quantidade, "itens.$.estoqueMinimo": estoqueMinimo } },
-                { new: true }
-            );
-
-            if (!estoqueFinal) {
-                estoqueFinal = await Estoque.findOneAndUpdate(
-                    { nomeInventario },
-                    { "$push": { itens: { produto: actualProductId, quantidade, estoqueMinimo } } },
-                    { new: true, upsert: true }
-                );
-            }
-
-            if (!estoqueFinal) {
-                throw new Error("Não foi possível adicionar o produto ao estoque. Documento de estoque não encontrado ou criado.");
-            }
-
-            await RedisPublisher.publishOperation({
-                entity: 'Estoque',
-                operation: 'UPDATE',
-                data: estoqueFinal.toObject()
-            });
-
-            return estoqueFinal;
-        } catch (error) {
-            console.error("Erro ao adicionar/atualizar produto no estoque:", error);
-            throw new Error("Não foi possível adicionar/atualizar o produto no estoque.");
+        if (produtoData.produtoId) {
+            produtoExistente = await Produto.findById(produtoData.produtoId);
+        } else if (produtoData.codigoItem) {
+            produtoExistente = await Produto.findOne({ codigoItem: produtoData.codigoItem });
         }
+
+        // Se não existir, tenta criar
+        // Validando a presença de nome, codigoItem, precoUnitario e categoria
+        if (
+            !produtoExistente &&
+            produtoData.nome &&
+            produtoData.codigoItem &&
+            (produtoData.precoUnitario !== undefined && produtoData.precoUnitario !== null) && // Verifica se precoUnitario é definido e não nulo
+            produtoData.categoria // Verifica se categoria é definida
+        ) {
+            produtoExistente = await Produto.create({
+                nome: produtoData.nome,
+                codigoItem: produtoData.codigoItem,
+                precoUnitario: produtoData.precoUnitario,
+                categoria: produtoData.categoria, // Passa categoria para criação
+            });
+        }
+
+        if (!produtoExistente) {
+            // Mensagem de erro mais específica
+            throw new Error("Produto não encontrado e dados insuficientes para criação (Nome, CodigoItem, Preço Unitário e Categoria são obrigatórios para um novo produto).");
+        }
+
+        // Busca o estoque geral
+        const estoqueGeral = await Estoque.findOne({ nomeInventario: "Estoque Geral" });
+
+        if (!estoqueGeral) {
+            throw new Error("Estoque Geral não encontrado.");
+        }
+
+        // Verifica se o produto já está no estoque
+        const indexItem = estoqueGeral.itens.findIndex(item =>
+            item.produto.toString() === produtoExistente._id.toString()
+        );
+
+        if (indexItem !== -1) {
+            // Atualiza item existente
+            estoqueGeral.itens[indexItem].quantidade = quantidade;
+            estoqueGeral.itens[indexItem].estoqueMinimo = estoqueMinimo;
+        } else {
+            // Adiciona novo item
+            estoqueGeral.itens.push({
+                produto: produtoExistente._id,
+                quantidade,
+                estoqueMinimo
+            });
+        }
+
+        const estoqueAtualizado = await estoqueGeral.save();
+
+        await RedisPublisher.publishOperation({
+            entity: 'Estoque',
+            operation: 'UPDATE',
+            data: estoqueAtualizado.toObject()
+        });
+
+        return estoqueAtualizado;
+    } catch (error) {
+        console.error("Erro ao adicionar/atualizar produto no estoque:", error);
+        // Lança o erro original ou uma mensagem mais genérica se não for uma validação
+        if (error instanceof Error) {
+            throw error;
+        }
+        throw new Error("Não foi possível adicionar/atualizar o produto no estoque.");
     }
+}
 
     async removeProdutoDoEstoque(produtoId: string, nomeInventario: string = "Estoque Geral"): Promise<IEstoqueGeralProps | null> {
         try {

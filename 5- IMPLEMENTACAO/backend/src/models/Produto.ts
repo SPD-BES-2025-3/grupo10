@@ -1,11 +1,12 @@
 import mongoose from "mongoose";
 
 export interface IProdutoProps extends Document {
-    _id: string;
+    _id: string | mongoose.Types.ObjectId;
     nome: string;
     descricao: string;
     codigoItem?: string;
     precoUnitario: number;
+    categoria: string; // Já existe
 }
 
 const produtoSchema = new mongoose.Schema({

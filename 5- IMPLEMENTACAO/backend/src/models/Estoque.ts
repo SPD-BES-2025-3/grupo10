@@ -1,21 +1,21 @@
-import mongoose, { Document } from "mongoose";
-import { IProdutoProps } from "./Produto";
+import mongoose, { Document, Types } from "mongoose";
 
-export interface IEstoqueProps extends Document {
-    produto: IProdutoProps['_id'];
+// Subdocumento de item de estoque
+export interface IEstoqueProps {
+    produto: Types.ObjectId;
     quantidade: number;
     estoqueMinimo: number;
 }
 
+// Documento principal do Estoque Geral
 export interface IEstoqueGeralProps extends Document {
-    _id: string;
     nomeInventario?: string;
     itens: IEstoqueProps[];
 }
 
 const estoqueSchema = new mongoose.Schema<IEstoqueProps>({
     produto: {
-        type: mongoose.Schema.Types.ObjectId as any,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Produto",
         required: [true, "O produto é obrigatório"],
     },
@@ -28,8 +28,7 @@ const estoqueSchema = new mongoose.Schema<IEstoqueProps>({
         type: Number,
         required: [true, "A quantidade mínima do estoque é obrigatória!"],
         default: 0
-    },
-
+    }
 }, { _id: false });
 
 const estoqueGeralSchema = new mongoose.Schema<IEstoqueGeralProps>({

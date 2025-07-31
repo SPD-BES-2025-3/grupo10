@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Document } from "mongoose";
 
 export type StatusMaquinario = 'OPERACIONAL' | 'MANUTENCAO_AGENDADA' | 'EM_MANUTENCAO' | 'CONCLUIDA' | 'INATIVO';
 
